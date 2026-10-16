@@ -1,0 +1,103 @@
+<div class="pnr-container">
+  <!-- SEARCH -->
+  <div class="pnr-search-box">
+    <input type="text" [(ngModel)]="pnr" maxlength="10" placeholder="Enter PNR" (keyup.enter)="searchPNR()"
+      (keypress)="allowOnlyNumbers($event)" (input)="sanitizePNR()" (paste)="blockNonNumericPaste($event)" />
+    <button class="btn-primary" (click)="searchPNR()">Search</button>
+  </div>
+
+  <!-- LOADING -->
+  <p *ngIf="loading">Loading...</p>
+
+  <div *ngIf="booking" class="pnr-card">
+
+  <!-- ================= TOP 3 CARDS ================= -->
+  <div class="pnr-top-section">
+
+    <!-- BOOKING -->
+    <div class="pnr-box">
+      <h4>Booking Details</h4>
+
+      <p><strong>PNR:</strong> {{ booking.pnr }}</p>
+      <p><strong>Status:</strong> {{ booking.status }}</p>
+      <p><strong>Total Amount:</strong> ₹{{ booking.totalAmount | number:'1.0-0' }}</p>
+    </div>
+
+    <!-- VEHICLE -->
+    <div class="pnr-box">
+      <h4>Vehicle Details</h4>
+
+      <p>
+        <strong>Vehicle:</strong>
+        {{ booking.vehicleInstance?.vehicle?.vehicleCode }}
+        ({{ booking.vehicleInstance?.vehicle?.vehicleModel }})
+      </p>
+
+      <p>
+        <strong>Company:</strong>
+        {{ booking.vehicleInstance?.vehicle?.travelCompany?.companyName }}
+      </p>
+    </div>
+
+    <!-- JOURNEY -->
+    <div class="pnr-box">
+      <h4>Journey Details</h4>
+
+      <p *ngIf="booking.vehicleInstance?.route?.routeName">
+        <strong>From - To:</strong>
+        {{ booking.vehicleInstance.route.routeName.split('-')[0] }}
+        -
+        {{ booking.vehicleInstance.route.routeName.split('-')[1] }}
+      </p>
+
+      <p>
+        <strong>Departure:</strong>
+        {{ booking.vehicleInstance?.departureDate | date:'mediumDate' }}
+        {{ booking.vehicleInstance?.departureTime }}
+      </p>
+
+      <p>
+        <strong>Arrival:</strong>
+        {{ booking.vehicleInstance?.arrivalDate | date:'mediumDate' }}
+        {{ booking.vehicleInstance?.arrivalTime }}
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ================= PASSENGER TABLE ================= -->
+  <div class="pnr-table-section">
+
+    <h4>Passengers</h4>
+
+    <table class="pnr-table">
+
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Seat</th>
+          <th>Age</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let p of booking.passenger">
+          <td>{{ p.firstName }} {{ p.lastName }}</td>
+          <td>{{ p.seatNumber }}</td>
+          <td>{{ p.age }}</td>
+          <td [ngClass]="{
+              'status-confirmed': p.status === 'Confirmed',
+              'status-cancelled': p.status === 'Cancelled'
+            }">
+            {{ p.status }}
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+</div>

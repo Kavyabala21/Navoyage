@@ -1,0 +1,153 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "Navoyage_Front-End": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/Navoyage_Front-End",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "allowedCommonJsDependencies": [
+              "html2canvas",
+              "canvg",
+              "core-js",
+              "raf",
+              "rgbcolor"
+            ],
+
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/Assets",
+                "output": "/Assets/"
+              },
+              {
+                "glob": "signalr.min.js",
+                "input": "node_modules/@microsoft/signalr/dist/browser",
+                "output": "/Assets/Vendor/signalr/"
+              }
+            ],
+
+            "styles": [
+              "src/styles.scss",
+              "node_modules/ngx-toastr/toastr.css",
+              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+            ],
+
+            "scripts": [],
+
+            "polyfills": [
+              "zone.js",
+              "@angular/localize/init"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "sourceMap": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "8MB",
+                  "maximumError": "10MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "500kB",
+                  "maximumError": "700kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "Navoyage_Front-End:build:production"
+            },
+            "development": {
+              "buildTarget": "Navoyage_Front-End:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n"
+        },
+
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "include": [
+              "src/**/*.spec.ts"
+            ],
+
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/Assets",
+                "output": "/Assets/"
+              },
+              {
+                "glob": "signalr.min.js",
+                "input": "node_modules/@microsoft/signalr/dist/browser",
+                "output": "/Assets/Vendor/signalr/"
+              }
+            ],
+
+            "styles": [
+              "src/styles.scss",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css",
+              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "node_modules/ngx-toastr/toastr.css"
+            ],
+
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "dc4d5e72-6c7d-4a77-81e8-0dc9fecf6d92"
+  }
+}

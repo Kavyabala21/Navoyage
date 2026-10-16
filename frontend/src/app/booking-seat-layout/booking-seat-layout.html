@@ -1,0 +1,165 @@
+<div class="container mt-4 seat-layout-page">
+
+  <h2 class="brand mb-3">Select Your Seats</h2>
+
+  <!-- ================= TRAIN BOOKING ================= -->
+  <div class="settings-wrapper" *ngIf="isTrain">
+
+    <div class="settings-card">
+
+      <label><strong>Select Coach Type</strong></label>
+
+      <div class="coach-list">
+
+        <div *ngFor="let coach of trainSeats" class="coach-card" [class.selected]="selectedCoach?.type === coach.type"
+          (click)="selectCoach(coach)">
+
+          <h4>{{ coach.type }}</h4>
+
+          <p>
+            Price: ₹{{ coach.BasePrice * distance | number:'1.0-0' }} </p>
+
+          <p>
+            Available: {{ coach.count }}
+          </p>
+
+        </div>
+
+      </div>
+
+      <label class="mt-3"><strong>Number of Passengers</strong></label>
+
+      <input type="number" [(ngModel)]="trainPassengerCount" min="1" max="6" class="form-control">
+
+      <p class="mt-3">
+        <strong>Total Amount:</strong>
+        ₹{{ totalPrice }}
+      </p>
+
+      <div class="actions">
+
+        <button class="dashboard-btn primary" (click)="proceed()" [disabled]="!selectedCoach">
+          Continue
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= BUS / FLIGHT SUMMARY ================= -->
+  <div class="settings-wrapper" *ngIf="!isTrain">
+
+    <div class="settings-card w-50">
+
+      <p>
+        <strong>Selected Seats:</strong>
+        {{ selectedSeatNumbers }}
+      </p>
+
+      <p>
+        <strong>Total Amount:</strong>
+        ₹{{ totalPrice }}
+      </p>
+
+      <div class="actions">
+
+        <button class="dashboard-btn primary" (click)="proceed()" [disabled]="!selectedSeats.length">
+          Proceed
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ERROR -->
+  <p *ngIf="errorMsg" class="text-danger">
+    {{ errorMsg }}
+  </p>
+
+
+  <!-- ================= SEAT LAYOUT (BUS / FLIGHT ONLY) ================= -->
+  <div class="deck-wrapper" *ngIf="layout && !isTrain">
+
+    <!-- LOWER DECK -->
+    <div class="deck">
+
+      <div class="deck-header">
+        Lower Deck
+      </div>
+
+      <div class="bus-layout" [style.gridTemplateColumns]="'repeat(' + getGridColumns() + ', var(--seat-width))'">
+
+        <ng-container *ngFor="let r of rowArray">
+          <ng-container *ngFor="let c of colArray">
+
+            <ng-container *ngIf="getSeat(lowerDeckSeats, r, c) as s">
+
+              <div class="seat-box" [ngClass]="getSeatClasses(s)" [style.gridColumn]="getGridPosition(c)"
+                (click)="toggleSeat(s)">
+                <span class="seat-icon">👤</span>
+
+                <span class="seat-price">
+                  ₹{{ (s.BasePrice * distance) | number:'1.0-0' }}
+                </span>
+
+              </div>
+
+            </ng-container>
+
+          </ng-container>
+        </ng-container>
+
+      </div>
+
+    </div>
+
+
+    <!-- UPPER DECK -->
+    <div class="deck" *ngIf="upperDeckSeats.length && !isFlight">
+
+      <div class="deck-header">
+        Upper Deck
+      </div>
+
+      <div class="bus-layout" [style.gridTemplateColumns]="'repeat(' + getGridColumns() + ', var(--seat-width))'">
+
+        <ng-container *ngFor="let r of rowArray">
+          <ng-container *ngFor="let c of colArray">
+
+            <ng-container *ngIf="getSeat(upperDeckSeats, r, c) as s">
+
+              <div class="seat-box sleeper upper" [ngClass]="getSeatClasses(s)" [style.gridColumn]="getGridPosition(c)"
+                (click)="toggleSeat(s)">
+                <span class="seat-icon">👤</span>
+
+                <span class="seat-price">
+                  ₹{{ s.calculatedPrice ?? (s.BasePrice * distance) | number:'1.0-0' }}
+                </span>
+
+              </div>
+
+            </ng-container>
+
+          </ng-container>
+        </ng-container>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= PASSENGER FORM ================= -->
+<app-passenger-form *ngIf="showPassengerForm" [selectedSeats]="selectedSeats" [instanceId]="instanceId"
+  (closeForm)="showPassengerForm = false">
+</app-passenger-form>

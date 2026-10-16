@@ -1,0 +1,164 @@
+<div class="container mt-4 seat-layout-page">
+
+  <div>
+    <h2 class="brand mb-2">Seat Layout Builder</h2>
+    <button class="dashboard-btn" (click)="goback()">Back</button>
+  </div>
+
+  <p class="capacity-text">Vehicle Capacity: {{ capacity }}</p>
+
+  <!-- ================= SETTINGS ================= -->
+  <div class="settings-wrapper">
+    <div class="settings-card w-50">
+
+      <!-- BUS SETTINGS -->
+      <ng-container *ngIf="!isFlight">
+        <label>Layout Type</label><br />
+        <select [(ngModel)]="layoutType" [disabled]="isEditMode">
+          <option value="BUS_SEATER">Bus – Seater</option>
+          <option value="BUS_SLEEPER">Bus – Sleeper</option>
+          <option value="BUS_MIXED">Bus – Mixed</option>
+        </select>
+      </ng-container>
+
+      <label >Rows</label>
+      <input type="number" [(ngModel)]="rows" [disabled]="isEditMode" />
+
+      <label>Columns</label>
+      <input type="number" [(ngModel)]="columns" [disabled]="isEditMode" />
+
+      <!-- FLIGHT MULTI AISLE -->
+      <ng-container *ngIf="isFlight">
+        <label>Aisle Columns (comma separated)</label>
+        <input type="text" [(ngModel)]="aisleInput" placeholder="Example: 3,7" [disabled]="isEditMode" />
+      </ng-container>
+
+      <!-- BUS SINGLE AISLE -->
+      <ng-container *ngIf="!isFlight">
+        <label>Aisle Column</label>
+        <input type="number" [(ngModel)]="aisleColumn" [disabled]="isEditMode" />
+      </ng-container>
+
+      <div class="actions">
+        <button class="dashboard-btn" (click)="generateSeats()">Generate Seats</button>
+        <button class="dashboard-btn" (click)="saveLayout()" [disabled]="!layout">
+          {{ isEditMode ? 'Update Layout' : 'Save Layout' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= SEAT GRID ================= -->
+  <div class="deck-wrapper" *ngIf="seats.length">
+
+    <!-- ================= LOWER DECK ================= -->
+    <div class="deck">
+
+      <div class="deck-header">
+        {{ isFlight ? 'Flight Seating Layout' : 'Lower Deck' }}
+      </div>
+
+      <div class="bus-layout" [style.gridTemplateColumns]="'repeat(' + getGridColumns() + ', var(--seat-width))'">
+
+        <ng-container *ngFor="let r of rowArray">
+          <ng-container *ngFor="let c of colArray">
+
+            <!-- FLIGHT: show all seats -->
+            <!-- BUS: show only lower deck seats -->
+            <ng-container *ngIf="getSeat(isFlight ? seats : lowerDeckSeats, r, c) as s">
+
+              <div class="seat-wrapper" [style.gridColumn]="getGridPosition(c)">
+
+                <div class="seat-box" [ngClass]="seatClass(s)" (click)="selectSeat(s)">
+
+                  <span class="seat-icon">👤</span>
+                  <span class="seat-price">₹{{ s.BasePrice }}</span>
+
+                </div>
+
+              </div>
+
+            </ng-container>
+
+          </ng-container>
+        </ng-container>
+
+      </div>
+    </div>
+
+    <!-- ================= UPPER DECK (BUS ONLY) ================= -->
+    <div class="deck" *ngIf="!isFlight && upperDeckSeats.length">
+
+      <div class="deck-header">Upper Deck</div>
+
+      <div class="bus-layout" [style.gridTemplateColumns]="'repeat(' + getGridColumns() + ', var(--seat-width))'">
+
+        <ng-container *ngFor="let r of rowArray">
+          <ng-container *ngFor="let c of colArray">
+
+            <ng-container *ngIf="getSeat(upperDeckSeats, r, c) as s">
+
+              <div class="seat-wrapper" [style.gridColumn]="getGridPosition(c)">
+
+                <div class="seat-box sleeper upper" [ngClass]="seatClass(s)" (click)="selectSeat(s)">
+
+                  <span class="seat-icon">👤</span>
+                  <span class="seat-price">₹{{ s.BasePrice }}</span>
+
+                </div>
+
+              </div>
+
+            </ng-container>
+
+          </ng-container>
+        </ng-container>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ================= SEAT EDIT MODAL ================= -->
+  <div class="overlay" *ngIf="selectedSeat">
+    <div class="seat-editor">
+
+      <h3>Edit Seat {{ selectedSeat.seatNo }}</h3>
+
+      <label>Seat Type</label>
+      <select [(ngModel)]="selectedSeat.type" [disabled]="selectedSeat?.deck === 'UPPER'">
+
+        <option value="SEATER">Seater</option>
+
+        <option value="SLEEPER" *ngIf="!isFlight">
+          Sleeper
+        </option>
+        <div class="text-muted small" *ngIf="selectedSeat?.deck === 'UPPER'">
+          Upper deck seats must remain Sleeper.
+        </div>
+      </select>
+
+      <!-- POSITION (LOCKED FOR BOTH BUS & FLIGHT) -->
+      <label>Position</label>
+      <input type="text" [value]="selectedSeat.position" readonly />
+
+      <!-- FLIGHT CABIN CLASS -->
+      <ng-container *ngIf="isFlight">
+        <label>Cabin Class</label>
+        <select [(ngModel)]="selectedSeat.cabinClass">
+          <option value="BUSINESS">Business</option>
+          <option value="ECONOMY">Economy</option>
+        </select>
+      </ng-container>
+
+      <!-- Price -->
+      <label>Price</label>
+      <input type="number" [(ngModel)]="selectedSeat.BasePrice" />
+
+      <button class="dashboard-btn primary" (click)="closeSeatEditor()">Done</button>
+
+    </div>
+  </div>
+
+</div>

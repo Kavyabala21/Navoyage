@@ -1,0 +1,57 @@
+<div class="auth-wrapper">
+  <div class="auth-card glass">
+
+    <!-- LOGO -->
+    <div class="text-center mb-3">
+      <img src="../../Assets/Images/NavoyageWCLogo.png" class="logo-img" alt="Navoyage logo" />
+      <h2 class="brand">Na<span class="brand-v">voyage</span></h2>
+      <p class="subtitle">Smart Travel. Seamless Journeys.</p>
+    </div>
+
+    <!-- LOGIN Modes -->
+    <div class="text-center mb-3">
+      <h6>Login</h6>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onLogin()">
+
+      <!-- LOGIN IDENTIFIER -->
+      <div class="form-group d-block mx-auto w-75">
+        <input (keydown.space)="$event.preventDefault()" type="text" formControlName="loginIdentifier"
+          placeholder="Email, phone number, or username" autocomplete="username" />
+        <small class="error" *ngIf="fieldError('loginIdentifier')">
+          {{ fieldError('loginIdentifier') }}
+        </small>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="form-group d-block w-75 mx-auto">
+        <div class="input-wrapper password-wrapper">
+
+          <input (keydown.space)="$event.preventDefault()" [type]="showPassword ? 'text' : 'password'"
+            formControlName="password" placeholder="Enter password" autocomplete="current-password" class="form-input" />
+          <span class="toggle-icon" (click)="togglePassword()">
+            <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </span>
+
+        </div>
+
+        <small class="error" *ngIf="fieldError('password')">
+          {{ fieldError('password') }}
+        </small>
+      </div>
+
+
+      <button class="btn-primary login-submit d-block mx-auto" type="submit" [disabled]="isLoading">
+        <span class="login-spinner" *ngIf="isLoading" aria-hidden="true"></span>
+        <span>{{ isLoading ? 'SIGNING IN...' : 'LOGIN' }}</span>
+      </button>
+    </form>
+
+    <div class="text-center mt-1">
+      <p class="mb-0">Don’t have an account? <a class="account-link" (click)="signup()">Register</a>
+      </p>
+    </div>
+
+  </div>
+</div>

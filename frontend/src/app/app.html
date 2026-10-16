@@ -1,0 +1,160 @@
+<!-- NAVBAR -->
+<nav class="navbar app-topbar" *ngIf="showHeader">
+  <div class="bar-left">
+    <button class="nav-control back-btn" (click)="goback(); $event.stopPropagation()" matTooltip="Go back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <button class="brand-lockup" (click)="gotohome()" matTooltip="Dashboard">
+      <img src="../Assets/Images/NavoyageWCLogo.png" class="logo-img" alt="Navoyage" />
+      <span class="brand-copy">
+        <span class="brand">Na<span class="brand-v">voyage</span></span>
+      </span>
+    </button>
+  </div>
+
+  <div class="bar-right">
+    <div class="pnr-search" *ngIf="role=='Customer' || !isLoggedIn">
+      <input [(ngModel)]="pnrValue" (input)="onPNRInput()" (keyup.enter)="searchPNR()" maxlength="10"
+        placeholder="Enter PNR" class="pnr-input" />
+
+      <button class="pnr-search-btn" type="button" (click)="searchPNR()" matTooltip="Search PNR">
+        <mat-icon>search</mat-icon>
+      </button>
+    </div>
+
+    <span class="role-chip" *ngIf="isLoggedIn">{{ role || 'User' }}</span>
+
+    <button class="btn nav-action" (click)="gotohome()" matTooltip="Home">
+      <mat-icon>home</mat-icon>
+    </button>
+
+    <button class="btn nav-action" *ngIf="role=='TravelCompanyOwner'" (click)="gotoLogs()" matTooltip="Logs & Profits">
+      <mat-icon>monitoring</mat-icon>
+    </button>
+
+    <button class="btn nav-action notification-btn" *ngIf="isLoggedIn" (click)="toggleNotifications()" matTooltip="Notifications">
+      <span class="badge-wrapper" [matBadge]="unreadCount" matBadgeColor="warn" [matBadgeHidden]="unreadCount === 0"
+        matBadgeOverlap="false">
+        <mat-icon>notifications</mat-icon>
+      </span>
+    </button>
+
+    <button class="btn nav-action" *ngIf="role=='Customer'" (click)="gotobookings()" matTooltip="Bookings">
+      <mat-icon>confirmation_number</mat-icon>
+    </button>
+
+    <button class="btn nav-action" *ngIf="role=='TravelCompanyOwner'" (click)="gotoroutes()" matTooltip="Manage Routes and stops">
+      <mat-icon>route</mat-icon>
+    </button>
+
+    <button class="btn nav-action" (click)="gotohelp()" matTooltip="Help" *ngIf="role=='Customer'">
+      <mat-icon>support_agent</mat-icon>
+    </button>
+
+    <button *ngIf="isLoggedIn" class="btn nav-action profile-action" (click)="accountView()" matTooltip="Profile">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+
+    <button *ngIf="!isLoggedIn" class="btn nav-action profile-action" (click)="goToLogin()" matTooltip="Login">
+      <mat-icon>login</mat-icon>
+    </button>
+  </div>
+</nav>
+<div class="route-progress" *ngIf="isNavigating" aria-label="Loading page">
+  <span></span>
+</div>
+<!-- ================= ACCOUNT OVERLAY ================= -->
+<div class="account-overlay" *ngIf="showUserMenu" (click)="closeAccountView()">
+  <div class="account-card" (click)="$event.stopPropagation()">
+    <div class="account-card-header">
+      <button class="account-close" (click)="closeAccountView()" aria-label="Close profile menu">&times;</button>
+      <div class="account-avatar">
+        <img src="../../Assets/Icons/person.svg" alt="Profile" />
+      </div>
+      <div class="account-greeting">
+        <span>SIGNED IN AS</span>
+        <h3>{{ username || 'Traveler' }}</h3>
+        <p>{{ email || 'Welcome back to Navoyage' }}</p>
+      </div>
+    </div>
+
+    <div class="account-menu-label">ACCOUNT</div>
+    <div class="account-menu">
+      <button class="account-menu-item" (click)="userprofile()">
+        <span class="account-menu-icon"><mat-icon>badge</mat-icon></span>
+        <span><strong>Personal details</strong><small>Profile and security</small></span>
+        <mat-icon class="account-chevron">chevron_right</mat-icon>
+      </button>
+      <button class="account-menu-item" (click)="gotobookings()">
+        <span class="account-menu-icon"><mat-icon>event_note</mat-icon></span>
+        <span><strong>My bookings</strong><small>View your journeys</small></span>
+        <mat-icon class="account-chevron">chevron_right</mat-icon>
+      </button>
+    </div>
+
+    <div class="account-footer-actions">
+      <button class="account-logout" (click)="logout()"><mat-icon>logout</mat-icon> Sign out</button>
+      <button class="account-back" (click)="closeAccountView()">Keep browsing</button>
+    </div>
+  </div>
+</div>
+<!-- NOTIFICATION BACKDROP (click outside closes panel) -->
+<div class="notification-backdrop" *ngIf="showNotifications" (click)="closeNotifications()">
+</div>
+<!-- NOTIFICATION PANEL -->
+<div class="notification-panel" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+  <!-- HEADER -->
+  <div class="notification-header">
+    <h3><mat-icon>notifications</mat-icon> Notifications</h3>
+    <button class="show-all" (click)="goToNotificationsPage()">
+      Show All
+    </button>
+  </div>
+  <!-- SEARCH -->
+  <input type="text" class="notification-search" placeholder="Search" [(ngModel)]="notificationSearch" />
+  <!-- EMPTY -->
+  <div *ngIf="filteredNotifications().length === 0" class="empty">
+    No recent notifications
+  </div>
+  <!-- LIST -->
+  <div *ngFor="let n of filteredNotifications()" class="notification-item" [class.unread]="!n.isRead">
+    <div class="dot"></div>
+    <div class="notification-content">
+      <small class="tag">{{ n.type || 'FYI' }}</small>
+      <p class="title">{{ n.title }}</p>
+      <p class="message">{{ n.message }}</p>
+      <div class="meta">
+        <span>{{ n.createdOn | date:'mediumDate' }}</span>
+        <span>{{ n.createdOn | date:'shortTime' }}</span>
+      </div>
+    </div>
+    <button class="dismiss-btn" (click)="markAndRemove(n)">
+      Mark as read
+    </button>
+  </div>
+</div>
+<!-- PAGE CONTENT -->
+<main class="page-content">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- GLOBAL FOOTER -->
+<footer class="app-footer" *ngIf="showFooter">
+  <div class="footer-container">
+    <div class="footer-left">
+      <span class="brand" (click)="gotohome()">
+        Na<span class="brand-v">voyage</span>
+      </span>
+    </div>
+    <div class="footer-center">
+      <span>&copy; 2025 Navoyage</span>
+      <span class="divider">|</span>
+      <span>Smart Travel. Seamless Journeys.</span>
+    </div>
+    <div class="footer-right">
+      <button class="footer-link" (click)="gotobookings()" *ngIf="role=='Customer'">Bookings</button>
+      <button class="footer-link" (click)="gotohelp()" *ngIf="role=='Customer'">Help</button>
+    </div>
+  </div>
+</footer>

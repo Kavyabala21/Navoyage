@@ -1,0 +1,286 @@
+<div class="page dashboard-page">
+
+  <!-- LOCATION PERMISSION OVERLAY -->
+  <div class="location-overlay" *ngIf="showLocationPopup">
+
+    <div class="location-box">
+      <h3>Enable Location</h3>
+      <p>Allow access to your location for better travel suggestions</p>
+
+      <div class="actions">
+        <button class="btn-primary" (click)="allowLocation()">Allow</button>
+        <button class="btn-secondary" (click)="denyLocation()">Deny</button>
+      </div>
+    </div>
+
+  </div>
+  <!-- ================= BANNER ================= -->
+  <section class="banner-section">
+    <img src="../../Assets/Images/banner_cg.png" class="banner-img" />
+
+    <div class="banner-slogan">
+      <h2 class="slogan">Smart Travel</h2>
+      <h2 class="slogan">Seamless Journeys</h2>
+    </div>
+
+    <!-- ================= SEARCH PANEL ================= -->
+    <div class="dashboard-journey-panel">
+      <div class="transport-icons">
+
+        <div class="transport-item">
+          <button class="dashboard-btn icon-btn" matTooltip="Bus" (click)="gotosearch('Bus')">
+            <mat-icon>directions_bus</mat-icon>
+          </button>
+        </div>
+
+        <div class="transport-item">
+          <button class="dashboard-btn icon-btn" matTooltip="Flight" (click)="gotosearch('Flight')">
+            <mat-icon>flight_takeoff</mat-icon>
+          </button>
+        </div>
+        <div class="transport-item">
+          <button class="dashboard-btn icon-btn" matTooltip="Train" (click)="gotosearch('Train')">
+            <mat-icon>train</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="dashboard-journey-form">
+        <div class="field-group">
+          <input list="fromStops" placeholder="From location" [(ngModel)]="fromPlace"
+            [ngClass]="{'error-field': showErrors && !fromPlace}" />
+          <span class="error-star" *ngIf="showErrors && !fromPlace">*</span>
+          <datalist id="fromStops">
+            <option *ngFor="let s of stops" [value]="s.stopName"></option>
+          </datalist>
+        </div>
+        <div class="field-group">
+          <input list="toStops" placeholder="To location" [(ngModel)]="toPlace"
+            [ngClass]="{'error-field': showErrors && !toPlace}" />
+          <span class="error-star" *ngIf="showErrors && !toPlace">*</span>
+          <datalist id="toStops">
+            <option *ngFor="let s of stops" [value]="s.stopName"></option>
+          </datalist>
+        </div>
+        <div class="field-group">
+          <input type="date" [(ngModel)]="departureDate" [min]="minDate"
+            [ngClass]="{'error-field': showErrors && !departureDate}" />
+          <span class="error-star" *ngIf="showErrors && !departureDate">*</span>
+        </div>
+        <div class="field-group">
+          <select [(ngModel)]="selectedMode" [ngClass]="{'error-field': showErrors && !selectedMode}">
+            <option value="" disabled>Travel Mode</option>
+            <option>Bus</option>
+            <option>Train</option>
+            <option>Flight</option>
+          </select>
+          <span class="error-star" *ngIf="showErrors && !selectedMode">*</span>
+        </div>
+        <button class="btn-primary" (click)="search()">Search</button>
+      </div>
+    </div>
+  </section>
+  <section class="main-content-section">
+    <div class="mode-section">
+      <h3 class="title">Choose Your Travel Mode</h3>
+      <p class="mode-subtitle">Pick the fastest, smartest way to move</p>
+
+      <div class="mode-grid">
+
+        <!-- BUS -->
+        <div class="mode-card" (click)="gotosearch('Bus')">
+
+          <div class="mode-card-header">
+            <span class="title mode">
+              {{ role !== 'Customer' && isLoggedIn ? '' : 'Travel By Bus' }}
+            </span>
+            <!-- ACTIONS -->
+            <div class="mode-actions" *ngIf="role !== 'Customer' && isLoggedIn">
+              <!-- OWNER ACTIONS -->
+              <ng-container *ngIf="role === 'TravelCompanyOwner'">
+                <button class="action-btn" (click)="gotovehicles('Bus'); $event.stopPropagation()">
+                  <mat-icon>add_circle</mat-icon>
+                  Add Vehicle
+                </button>
+                <button class="action-btn" (click)="veiwAllVehicles('Bus'); $event.stopPropagation()">
+                  <mat-icon>directions_bus</mat-icon>
+                  View Vehicles
+                </button>
+              </ng-container>
+              <!-- ADMIN ACTION -->
+              <button *ngIf="role === 'Admin'" class="action-btn"
+                (click)="adminControls('Bus'); $event.stopPropagation()">
+                <mat-icon>description</mat-icon>
+                Manage Documents
+              </button>
+            </div>
+          </div>
+          <div class="mode-body" (click)="(role === 'Customer' || !isLoggedIn) && openModeSearch('Bus')">
+            <img src="../../Assets/Images/Bus-Navoyage-Half.png" />
+          </div>
+        </div>
+        <div class="mode-card" (click)="gotosearch('Train')">
+          <div class="mode-card-header">
+            <span class="title mode">
+              {{ role !== 'Customer' && isLoggedIn ? '' : 'Travel By Train' }}
+            </span>
+            <div class="mode-actions" *ngIf="role !== 'Customer' && isLoggedIn">
+              <ng-container *ngIf="role === 'TravelCompanyOwner'">
+                <button class="action-btn" (click)="gotovehicles('Train'); $event.stopPropagation()">
+                  <mat-icon>add_circle</mat-icon>
+                  Add Vehicle
+                </button>
+                <button class="action-btn" (click)="veiwAllVehicles('Train'); $event.stopPropagation()">
+                  <mat-icon>train</mat-icon>
+                  View Vehicles
+                </button>
+              </ng-container>
+              <button *ngIf="role === 'Admin'" class="action-btn"
+                (click)="adminControls('Train'); $event.stopPropagation()">
+                <mat-icon>description</mat-icon>
+                Manage Documents
+              </button>
+            </div>
+          </div>
+          <div class="mode-body" (click)="(role === 'Customer' || !isLoggedIn) && openModeSearch('Train')">
+            <img src="../../Assets/Images/Train-Navoyage-Half.png" />
+          </div>
+
+        </div>
+        <!-- ================= FLIGHT ================= -->
+
+        <div class="mode-card" (click)="gotosearch('Flight')">
+          <div class="mode-card-header">
+            <span class="title mode">
+              {{ role !== 'Customer' && isLoggedIn ? '' : 'Travel By Flight' }}
+            </span>
+            <div class="mode-actions" *ngIf="role !== 'Customer' && isLoggedIn">
+              <ng-container *ngIf="role === 'TravelCompanyOwner'">
+                <button class="action-btn" (click)="gotovehicles('Flight'); $event.stopPropagation()">
+                  <mat-icon>add_circle</mat-icon>
+                  Add Vehicle
+                </button>
+                <button class="action-btn" (click)="veiwAllVehicles('Flight'); $event.stopPropagation()">
+                  <mat-icon>flight</mat-icon>
+                  View Vehicles
+                </button>
+              </ng-container>
+              <button *ngIf="role === 'Admin'" class="action-btn"
+                (click)="adminControls('Flight'); $event.stopPropagation()">
+                <mat-icon>description</mat-icon>
+                Manage Documents
+              </button>
+            </div>
+          </div>
+          <div class="mode-body" (click)="(role === 'Customer' || !isLoggedIn) && openModeSearch('Flight')">
+            <img src="../../Assets/Images/Flight-Navoyage.png" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ================= FEATURES ================= -->
+    <div class="features-section" >
+      <div class="feature-card" (click)="gotohelp()">
+        <mat-icon style="width:40px;height:40px">support_agent</mat-icon>
+        <h4>24/7 Travel Support</h4>
+        <p>We’re here for you anytime, anywhere</p>
+      </div>
+      <div class="feature-card">
+        <mat-icon style="width:40px;height:40px">security</mat-icon>
+        <h4>Secure Payments</h4>
+        <p>100% safe & encrypted transactions</p>
+      </div>
+      <div class="feature-card">
+        <mat-icon style="width:40px;height:40px">verified</mat-icon>
+        <h4>Best Price Guarantee</h4>
+        <p>Unbeatable deals on every booking</p>
+      </div>
+      <div class="feature-card">
+      <mat-icon style="width:40px;height:40px" class="feature-icon">assignment</mat-icon>
+      <h4>Total Bookings</h4>
+      <h3 class="booking-count">{{ totalBookings }}+</h3>
+      <p>Total bookings made till date</p>
+    </div>
+    </div>
+  </section>
+  <!-- AI ASSISTANT BUTTON -->
+  <img class="ai-float-btn" *ngIf="!showAiModal" src="../../Assets/Videos/CBWB.gif"
+    matTooltip="Ask about your destination ✈️" matTooltipPosition="left" (click)="openAiModal()" />
+  <div class="ai-modal" *ngIf="showAiModal">
+    <div class="ai-box">
+      <div class="chat-header">
+        <strong><img class="bot-img" src="../../Assets/Images/bot.png"></strong>
+        <button class="dashboard-btn" (click)="closeAiModal()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <!-- CHAT WINDOW -->
+      <div class="chat-window">
+        <div *ngFor="let chat of chatHistory; let i = index">
+          <div *ngIf="chat.isUser" class="user">
+            {{ chat.text }}
+          </div>
+          <div *ngIf="!chat.isUser" class="bot">
+            <div class="bot-content">
+              <div *ngIf="chat.trip" class="live-label">
+                <span class="live-dot"></span>{{ isTyping && i === chatHistory.length - 1 ? 'Vay is curating your trip' : 'Your trip is ready' }}
+              </div>
+              <div *ngIf="chat.trip" class="trip-plan">
+                <div class="trip-plan-heading">
+                  <div>
+                    <span class="eyebrow">YOUR AI-PLANNED ESCAPE</span>
+                    <h3>Two days of discovery</h3>
+                  </div>
+                  <span class="budget-pill"><mat-icon>account_balance_wallet</mat-icon>{{ chat.trip.budget }}</span>
+                </div>
+                <p class="trip-summary" [class.is-empty]="!chat.trip.summary">{{ chat.trip.summary }}<span *ngIf="isTyping && !chat.trip.summary" class="cursor"></span></p>
+                <div class="trip-section" *ngIf="chat.trip.places?.length">
+                  <h4><mat-icon>explore</mat-icon> Places to explore</h4>
+                  <div class="trip-list"><span *ngFor="let place of chat.trip.places">{{ place }}</span></div>
+                </div>
+                <div class="trip-section" *ngIf="chat.trip.food?.length">
+                  <h4><mat-icon>restaurant</mat-icon> Eat like a local</h4>
+                  <div class="trip-list"><span *ngFor="let food of chat.trip.food">{{ food }}</span></div>
+                </div>
+                <div class="trip-section" *ngIf="chat.trip.hotels?.length">
+                  <h4><mat-icon>hotel</mat-icon> Comfortable stays</h4>
+                  <div class="trip-list"><span *ngFor="let hotel of chat.trip.hotels">{{ hotel }}</span></div>
+                </div>
+              </div>
+              <div *ngIf="!chat.trip" class="bot-text">
+              {{ chat.text }}
+              </div>
+            </div>
+            <button class="speaker-btn" (click)="speak(chat.text, i)">
+              <mat-icon>
+                {{ speakingIndex === i ? 'volume_up' : 'volume_off' }}
+              </mat-icon>
+            </button>
+          </div>
+          <div *ngIf="chat.places?.length" class="image-scroll-container">
+            <div *ngFor="let p of chat.places" class="image-card">
+              <h4 class="place-title">{{ p.name }}</h4>
+              <img [src]="p.image" />
+            </div>
+          </div>
+        </div>
+        <div *ngIf="isTyping" class="typing">
+          AI is generating...
+        </div>
+      </div>
+      <div *ngIf="isListening" class="typing">
+        Listening... Click mic to stop
+      </div>
+      <div class="chat-input">
+        <input [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="Enter destination..." />
+        <button class="btn-primary" (click)="toggleVoice()">
+          <mat-icon *ngIf="!isMicActive">mic</mat-icon>
+          <mat-icon *ngIf="isMicActive">mic_off</mat-icon>
+        </button>
+        <!-- SEND -->
+        <button class="btn-primary" (click)="sendMessage()">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

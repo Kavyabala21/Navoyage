@@ -1,0 +1,66 @@
+<div class="container mt-4">
+
+  <div>
+    <h2 class="brand">Train Seat Pricing</h2>
+    <button class="dashboard-btn" (click)="goback()">Back</button>
+  </div>
+
+  <p class="capacity-text">
+    Train Capacity: {{ capacity }}
+  </p>
+
+  <table class="table table-bordered mt-3">
+
+    <thead>
+      <tr>
+        <th>Seat Type</th>
+        <th>Total Seats</th>
+        <th>Base Price (₹)</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <tr *ngFor="let s of seatTypes">
+
+        <td>{{ s.type }}</td>
+
+        <td>
+          <input
+            type="number"
+            [(ngModel)]="s.count"
+            min="0"
+            class="form-control">
+        </td>
+
+        <td>
+          <input
+            type="number"
+            [(ngModel)]="s.BasePrice"
+            min="0"
+            class="form-control">
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  <div class="mt-3">
+
+    <p>
+      Total Seats Entered:
+      <strong>{{ totalSeats }}</strong>
+      / {{ capacity }}
+    </p>
+
+  </div>
+
+  <button
+    class="dashboard-btn primary"
+    (click)="savePrices()">
+    {{ isEditMode ? 'Update Prices' : 'Save Prices' }}
+  </button>
+
+</div>

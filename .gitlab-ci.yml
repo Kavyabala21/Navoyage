@@ -1,0 +1,8 @@
+stages:
+  - security
+
+check-source-secrets:
+  stage: security
+  image: node:22-alpine
+  script:
+    - node scripts/check-secrets.cjs

@@ -1,0 +1,170 @@
+<div class="container admin-docs-container">
+
+  <!-- ================= LIST VIEW ================= -->
+  <ng-container *ngIf="!selectedDoc">
+
+    <div class="admin-doc-actions">
+      <button class="dashboard-btn mb-3" (click)="viewAllDocuments()">
+        View All Documents
+      </button>
+    </div>
+
+    <h2 class="brand mb-3">
+      Pending <span *ngIf="modeofTransport">{{ modeofTransport }}</span> Documents
+    </h2>
+
+    <!-- NO DATA -->
+    <p *ngIf="loading"
+       class="admin-doc-info">
+      Loading pending documents...
+    </p>
+
+    <p *ngIf="!loading && filteredDocuments.length === 0"
+       class="admin-doc-info">
+      No pending documents available
+    </p>
+
+    <!-- DOCUMENT LIST -->
+    <div class="vehicledoccontainers w-100">
+      <div
+        class="admin-doc-card"
+        *ngFor="let doc of filteredDocuments">
+
+        <img
+          *ngIf="doc.vehicle?.vehicleImageUrl"
+          class="TrasportImage"
+          [src]="backendUrl + doc.vehicle?.vehicleImageUrl"
+          alt="Vehicle Image"
+        />
+
+        <p><strong>Document:</strong> {{ doc.documentName }}</p>
+        <p><strong>Vehicle Code:</strong> {{ doc.vehicle?.vehicleCode || vehicleMap[doc.vehicleId] }}</p>
+        <p>
+          <strong>Travel Company:</strong>
+          {{ doc.vehicle?.travelCompany?.companyName || travelCompanyMap[doc.uploadedBy] || 'Not available' }}
+        </p>
+
+        <p>
+          <strong>Uploaded On:</strong>
+          {{ doc.uploadedOn | date:'dd MMM yyyy, hh:mm a' }}
+        </p>
+
+        <p>
+          <strong>Status:</strong>
+          <span class="doc-status">{{ doc.status }}</span>
+        </p>
+
+        <div class="admin-doc-actions mt-0">
+          <button class="dashboard-btn" (click)="openReview(doc)">
+            Review
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </ng-container>
+<ng-container *ngIf="selectedDoc">
+  <div class="admin-review-wrapper">
+
+    <div class="admin-review-card">
+
+      <h2 class="review-title">Review Document</h2>
+
+      <div class="review-layout">
+
+        <!-- LEFT SIDE : DOCUMENT DETAILS -->
+        <div class="review-left">
+
+          <div class="detail-item">
+            <span class="label">Document</span>
+            <span class="value">{{ selectedDoc.documentName }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="label">Vehicle Code</span>
+            <span class="value">{{ selectedDoc.vehicle?.vehicleCode || vehicleMap[selectedDoc.vehicleId] }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="label">Travel Company</span>
+            <span class="value">
+              {{ selectedDoc.vehicle?.travelCompany?.companyName || travelCompanyMap[selectedDoc.uploadedBy] || 'Not available' }}
+            </span>
+          </div>
+
+          <div class="detail-item">
+            <span class="label">Uploaded On</span>
+            <span class="value">
+              {{ selectedDoc.uploadedOn | date:'dd MMM yyyy, hh:mm a' }}
+            </span>
+          </div>
+
+          <div class="download-section">
+            <button class="download-btn"
+              (click)="download(selectedDoc)"
+              matTooltip="Download document">
+              <mat-icon>download</mat-icon>
+              Download
+            </button>
+          </div>
+
+        </div>
+
+        <!-- RIGHT SIDE : ADMIN ACTIONS -->
+        <div class="review-right">
+
+          <div class="form-group">
+            <label>Vehicle Condition <span>*</span></label>
+            <select
+              class="form-control"
+              [(ngModel)]="vehicleCondition"
+              (change)="remarks=''">
+              <option value="" disabled>Select condition</option>
+              <option>Good</option>
+              <option>Moderate</option>
+              <option>Bad</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Admin Remarks / Rejection Reason</label>
+            <textarea
+              class="form-control"
+              rows="4"
+              [(ngModel)]="remarks">
+            </textarea>
+          </div>
+
+          <div class="review-actions">
+
+            <button
+              class="approve-btn"
+              (click)="approve()"
+              [disabled]="!canApprove()">
+              Approve
+            </button>
+
+            <button
+              class="reject-btn"
+              (click)="reject()"
+              [disabled]="!canReject()">
+              Reject
+            </button>
+
+            <button
+              class="cancel-btn"
+              (click)="cancelReview()">
+              Cancel
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</ng-container>
+</div>

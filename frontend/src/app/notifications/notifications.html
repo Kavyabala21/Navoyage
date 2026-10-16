@@ -1,0 +1,43 @@
+<div class="notifications-page">
+  <!-- SEARCH -->
+  <input type="text" class="search-box" placeholder="Search notifications" [(ngModel)]="searchText" />
+
+  <!-- EMPTY -->
+<div *ngIf="!loading && filteredNotifications.length === 0" class="empty-container">
+
+  <img
+    src="../../Assets/Images/no-notifications.jpg"
+    class="empty-image"
+    alt="No notifications"
+  />
+
+  <h3>No Notifications Found</h3>
+  <button class="btn-primary mt-2" (click)="goBack()">
+    Go to Dashboard
+  </button>
+
+</div>
+
+  <!-- LOADING -->
+  <p class="loading" *ngIf="loading">
+    Loading notifications...
+  </p>
+
+  <!-- LIST -->
+  <div class="notification-card" *ngFor="let n of filteredNotifications" [class.unread]="!n.isRead">
+
+    <div class="dot"></div>
+
+    <div class="content">
+      <span class="tag">{{ n.type || 'FYI' }}</span>
+
+      <h4>{{ n.title }}</h4>
+      <p>{{ n.message }}</p>
+
+      <small>{{ n.createdOn | date:'medium' }}</small>
+    </div>
+
+    
+  </div>
+
+</div>

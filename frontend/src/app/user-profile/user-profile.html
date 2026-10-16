@@ -1,0 +1,176 @@
+<div class="profile-page">
+  <div class="profile-shell">
+
+    <div class="profile-hero">
+      <div class="profile-hero-identity">
+        <div class="profile-avatar-large">
+          <img src="../../Assets/Icons/person.svg" alt="Profile" />
+        </div>
+        <div>
+          <span class="profile-eyebrow">ACCOUNT CENTER</span>
+          <h1>Personal details</h1>
+          <p>Keep your account information and security settings up to date.</p>
+        </div>
+      </div>
+      <span class="profile-role-badge">{{ role || 'Member' }}</span>
+    </div>
+
+    <!-- VIEW MODE -->
+    <div *ngIf="!editMode && !changePasswordMode" class="profile-content-grid">
+      <section class="profile-panel profile-details-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="panel-kicker">YOUR PROFILE</span>
+            <h2>Welcome back, {{ username }}</h2>
+          </div>
+          <span class="verified-badge"><span class="verified-dot"></span> Active account</span>
+        </div>
+
+        <div class="profile-detail-grid">
+          <div class="profile-detail-item profile-detail-wide">
+            <span class="detail-label">Full name</span>
+            <strong>{{ username || 'Not available' }}</strong>
+            <small>Your registered name</small>
+          </div>
+          <div class="profile-detail-item">
+            <span class="detail-label">Email address</span>
+            <strong>{{ profileForm.value.email || 'Not available' }}</strong>
+            <small>Primary contact</small>
+          </div>
+          <div class="profile-detail-item">
+            <span class="detail-label">Phone number</span>
+            <strong>+91-{{ profileForm.value.phoneNumber || 'Not available' }}</strong>
+            <small>Used for travel updates</small>
+          </div>
+        </div>
+
+        <div class="profile-actions">
+          <button class="profile-action-primary" (click)="enableEdit()">
+            <img src="../../Assets/Icons/person.svg" alt="" /> Edit profile
+          </button>
+          <button class="profile-action-secondary" (click)="changepassword()">
+            <span class="action-lock">&#128274;</span> Change password
+          </button>
+        </div>
+      </section>
+
+      <aside class="profile-security-card">
+        <div class="security-icon">&#128274;</div>
+        <span class="panel-kicker">ACCOUNT SECURITY</span>
+        <h3>Your account is protected</h3>
+        <p>Use a strong password and keep your contact information current for a safer travel experience.</p>
+        <div class="security-line"><span></span> Profile information secured</div>
+        <div class="security-line"><span></span> Login credentials protected</div>
+      </aside>
+    </div>
+
+    <!-- EDIT PROFILE -->
+
+    <form *ngIf="editMode" class="profile-panel profile-form-panel" [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+      <div class="panel-heading">
+        <div><span class="panel-kicker">PROFILE SETTINGS</span><h2>Edit your details</h2></div>
+        <span class="form-note">Changes require your current password</span>
+      </div>
+
+      <div class="profile-form-grid">
+      <div class="profile-form-field">
+        <label>Email</label>
+        <input class="profile-fields" formControlName="email" autocomplete="email" />
+        <small class="error">{{ fieldError(profileForm,'email') }}</small>
+      </div>
+
+      <div class="profile-form-field">
+        <label>Phone Number</label>
+        <input class="profile-fields" [value]="'+91-' + profileForm.value.phoneNumber" disabled /> <small
+          class="error">{{ fieldError(profileForm,'phoneNumber') }}</small>
+      </div>
+
+      <div class="profile-form-field profile-form-wide">
+        <label>Confirm Password</label>
+        <input class="profile-fields" type="password" formControlName="currentPassword"
+          (keydown.space)="$event.preventDefault()" autocomplete="current-password" />
+        <small class="error">{{ fieldError(profileForm,'currentPassword') }}</small>
+      </div>
+      </div>
+
+      <div class="profile-form-actions">
+        <button class="profile-action-primary" [disabled]="verifying">{{ verifying ? 'Saving...' : 'Save changes' }}</button>
+        <button type="button" class="profile-action-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+
+    <!-- CHANGE PASSWORD -->
+    <form *ngIf="changePasswordMode" class="profile-panel profile-form-panel" [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
+      <div class="panel-heading">
+        <div><span class="panel-kicker">ACCOUNT SECURITY</span><h2>Change password</h2></div>
+        <span class="form-note">Use 8 or more characters</span>
+      </div>
+
+      <div class="profile-form-grid password-form-grid">
+      <div class="profile-form-field">
+        <label>Old Password</label>
+
+        <div class="input-wrapper password-wrapper">
+
+          <input class="profile-fields" [type]="showOldPassword ? 'text' : 'password'" formControlName="oldPassword"
+            (keydown.space)="$event.preventDefault()" />
+
+          <span class="toggle-icon" (click)="toggleOldPassword()">
+            <i class="fa-solid" [ngClass]="showOldPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </span>
+
+        </div>
+
+        <small class="error">
+          {{ fieldError(passwordForm,'oldPassword') }}
+        </small>
+      </div>
+
+      <div class="profile-form-field">
+        <label>New Password</label>
+
+        <div class="input-wrapper password-wrapper">
+
+          <input class="profile-fields" [type]="showNewPassword ? 'text' : 'password'" formControlName="newPassword"
+            (keydown.space)="$event.preventDefault()" />
+
+          <span class="toggle-icon" (click)="toggleNewPassword()">
+            <i class="fa-solid" [ngClass]="showNewPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </span>
+
+        </div>
+
+        <small class="error" *ngIf="fieldError(passwordForm,'newPassword')">
+          {{ fieldError(passwordForm,'newPassword') }}
+        </small>
+      </div>
+
+      <div class="profile-form-field">
+        <label>Confirm Password</label>
+
+        <div class="input-wrapper password-wrapper">
+
+          <input class="profile-fields" [type]="showConfirmPassword ? 'text' : 'password'"
+            formControlName="confirmPassword" />
+
+          <span class="toggle-icon" (click)="toggleConfirmPassword()">
+            <i class="fa-solid" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </span>
+
+        </div>
+
+        <small class="error" *ngIf="fieldError(passwordForm,'confirmPassword')">
+          {{ fieldError(passwordForm,'confirmPassword') }}
+        </small>
+      </div>
+
+      </div>
+      <div class="profile-form-actions">
+        <button class="profile-action-primary" [disabled]="verifying">{{ verifying ? 'Updating...' : 'Update password' }}</button>
+        <button type="button" class="profile-action-secondary" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+
+    <button class="profile-back-link" (click)="gotohome()">&#8592; Back to dashboard</button>
+  </div>
+</div>

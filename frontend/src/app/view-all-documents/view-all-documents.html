@@ -1,0 +1,117 @@
+<div class="page container mt-4 document-register-page">
+  <div class="register-header">
+    <div>
+      <p class="panel-kicker">Admin document center</p>
+      <h2 class="brand mb-1">All Vehicle Documents</h2>
+      <p class="text-search mb-0">Review every uploaded vehicle document and its approval state.</p>
+    </div>
+
+    <button class="dashboard-btn" (click)="backtohome()" matTooltip="Back to pending approvals">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+  </div>
+
+  <div class="document-stats">
+    <div class="document-stat">
+      <span>Total</span>
+      <strong>{{ documents.length }}</strong>
+    </div>
+    <div class="document-stat">
+      <span>Pending</span>
+      <strong>{{ pendingCount }}</strong>
+    </div>
+    <div class="document-stat">
+      <span>Approved</span>
+      <strong>{{ approvedCount }}</strong>
+    </div>
+    <div class="document-stat">
+      <span>Rejected</span>
+      <strong>{{ rejectedCount }}</strong>
+    </div>
+  </div>
+
+  <div class="filter-bar document-filter-bar">
+    <input
+      type="text"
+      placeholder="Search document, vehicle, company, transport mode"
+      [(ngModel)]="searchText"
+    />
+
+    <select [(ngModel)]="statusFilter">
+      <option value="">All Status</option>
+      <option value="Pending">Pending</option>
+      <option value="Approved">Approved</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+
+    <button class="dashboard-btn" type="button" (click)="clearFilters()">
+      <mat-icon>filter_alt_off</mat-icon>
+      Clear
+    </button>
+
+    <button class="dashboard-btn" type="button" (click)="loadDocuments()" [disabled]="loading">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
+
+  <p *ngIf="loading" class="text-search">Loading documents...</p>
+
+  <div *ngIf="!loading && filteredDocuments.length === 0" class="empty-container document-empty">
+    <mat-icon>description</mat-icon>
+    <h3>No documents found</h3>
+    <p>There are no documents matching the current filter.</p>
+  </div>
+
+  <div class="table-scroll" *ngIf="!loading && filteredDocuments.length > 0">
+    <table class="vehicle-table document-register-table">
+      <thead>
+        <tr>
+          <th>Document</th>
+          <th>Vehicle</th>
+          <th>Company</th>
+          <th>Mode</th>
+          <th>Uploaded</th>
+          <th>Status</th>
+          <th>Remarks</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let doc of filteredDocuments; trackBy: trackByDocumentId">
+          <td>
+            <strong>{{ doc.documentName }}</strong>
+            <small>#{{ doc.documentId }}</small>
+          </td>
+          <td>
+            {{ doc.vehicle?.vehicleCode || ('Vehicle #' + doc.vehicleId) }}
+            <small>{{ doc.vehicle?.vehicleModel || 'Model not available' }}</small>
+          </td>
+          <td>{{ doc.vehicle?.travelCompany?.companyName || 'Not available' }}</td>
+          <td>{{ doc.vehicle?.modeOfTransport || 'Not available' }}</td>
+          <td>{{ doc.uploadedOn | date:'dd MMM yyyy, hh:mm a' }}</td>
+          <td>
+            <span [ngClass]="{
+              pending: doc.status === 'Pending',
+              approved: doc.status === 'Approved',
+              rejected: doc.status === 'Rejected'
+            }">
+              {{ doc.status }}
+            </span>
+          </td>
+          <td>{{ doc.adminRemarks || 'None' }}</td>
+          <td>
+            <button class="icons" type="button" (click)="openDocument(doc)" matTooltip="Open document">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+            <button class="icons" type="button" (click)="download(doc)" matTooltip="Download document">
+              <mat-icon>download</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

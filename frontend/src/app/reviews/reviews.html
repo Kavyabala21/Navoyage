@@ -1,0 +1,41 @@
+<div class="reviews-container">
+
+  <!-- Average Rating -->
+  <div class="avg-rating">
+    <span class="avg-value">{{ averageRating | number:'1.1-1' }}</span>
+    <div class="stars">
+      <span *ngFor="let s of starArray(5)"
+            [class.filled]="s <= averageRating">
+        ★
+      </span>
+    </div>
+  </div>
+
+  <!-- Add / Edit Review -->
+  <div class="review-form">
+    <h3>{{ editingReviewId ? 'Edit Review' : 'Add Review' }}</h3>
+
+    <div class="stars selectable">
+      <span *ngFor="let s of starArray(5)"
+            (click)="setRating(s)"
+            [class.filled]="isFilledStar(s)">
+        ★
+      </span>
+    </div>
+
+    <textarea
+      placeholder="Write your comments (optional)"
+      [(ngModel)]="comments">
+    </textarea>
+
+    <button (click)="submitReview()">
+      {{ editingReviewId ? 'Update' : 'Submit' }}
+    </button>
+
+    <button *ngIf="editingReviewId"
+            class="cancel"
+            (click)="resetForm()">
+      Cancel
+    </button>
+  </div>
+</div>

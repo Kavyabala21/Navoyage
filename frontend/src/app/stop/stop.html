@@ -1,0 +1,202 @@
+<div class="stop-page">
+
+  <section class="stop-shell-header">
+    <div>
+      <p class="stop-eyebrow">Network Registry</p>
+      <h2>Stop Operations</h2>
+    </div>
+
+    <div class="stop-kpis">
+      <div class="stop-stat">
+        <mat-icon>pin_drop</mat-icon>
+        <div>
+          <span>Total Stops</span>
+          <strong>{{ totalStops }}</strong>
+        </div>
+      </div>
+
+      <div class="stop-stat">
+        <mat-icon>manage_search</mat-icon>
+        <div>
+          <span>Showing</span>
+          <strong>{{ filteredStopCount }}</strong>
+        </div>
+      </div>
+
+      <div class="stop-stat stop-stat-wide">
+        <mat-icon>my_location</mat-icon>
+        <div>
+          <span>Selected Location</span>
+          <strong>{{ coordinateText }}</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stop-workbench">
+
+    <div class="map-panel stop-map-panel">
+      <div class="map-toolbar">
+        <div>
+          <span class="panel-kicker">Map</span>
+          <h3>Location Preview</h3>
+        </div>
+
+        <span class="status-chip">
+          <mat-icon>gps_fixed</mat-icon>
+          {{ coordinateText }}
+        </span>
+      </div>
+
+      <div id="map"></div>
+    </div>
+
+    <div class="control-panel stop-form-panel">
+      <div class="panel-heading">
+        <div class="heading-icon">
+          <mat-icon>{{ editingStopId ? 'edit_location_alt' : 'add_location_alt' }}</mat-icon>
+        </div>
+        <div>
+          <span class="panel-kicker">{{ selectedStopLabel }}</span>
+          <h3>Add / Edit Stop</h3>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <label>Location</label>
+        <div class="input-with-icon">
+          <mat-icon>search</mat-icon>
+          <input
+            type="text"
+            placeholder="Search city, station, airport"
+            [(ngModel)]="locationQuery"
+            (input)="searchLocation()"
+            (keyup.enter)="selectFirstSuggestion()" />
+        </div>
+
+        <ul class="suggestions" *ngIf="suggestions.length">
+          <li *ngFor="let s of suggestions" (click)="selectSuggestion(s)">
+            <mat-icon>place</mat-icon>
+            <span>{{ s.display_name }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="field">
+        <label>Stop Name</label>
+        <div class="input-with-icon">
+          <mat-icon>flag</mat-icon>
+          <input type="text" [(ngModel)]="stopName" placeholder="Enter stop name" />
+        </div>
+      </div>
+
+      <div class="coord-grid">
+        <div>
+          <span>Latitude</span>
+          <strong>{{ latitude == null ? '--' : (latitude | number:'1.5-5') }}</strong>
+        </div>
+        <div>
+          <span>Longitude</span>
+          <strong>{{ longitude == null ? '--' : (longitude | number:'1.5-5') }}</strong>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-primary" type="button" (click)="saveStop()" [disabled]="isSaving">
+          <mat-icon>{{ editingStopId ? 'save' : 'add_location_alt' }}</mat-icon>
+          <span>{{ isSaving ? 'Saving' : (editingStopId ? 'Update Stop' : 'Save Stop') }}</span>
+        </button>
+
+        <button class="secondary-action" type="button" (click)="reset()" matTooltip="Clear selected stop">
+          <mat-icon>restart_alt</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="manage-panel stop-list-panel">
+      <div class="panel-heading list-heading">
+        <div>
+          <span class="panel-kicker">Inventory</span>
+          <h3>Manage Stops</h3>
+        </div>
+      </div>
+
+      <div class="manage-search">
+        <div class="input-with-icon">
+          <mat-icon>filter_alt</mat-icon>
+          <input
+            type="text"
+            placeholder="Search stop name or ID"
+            [(ngModel)]="stopSearch" />
+          <button
+            *ngIf="stopSearch"
+            type="button"
+            class="inline-icon-btn"
+            (click)="clearStopSearch()"
+            matTooltip="Clear search">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="stops-list">
+        <table class="stops-table">
+          <thead>
+            <tr>
+              <th>Stop</th>
+              <th>Coordinates</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="loadingStops">
+              <td colspan="3">
+                <div class="empty-state compact">
+                  <mat-icon>hourglass_top</mat-icon>
+                  <span>Loading stops</span>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="!loadingStops && !filteredStops.length">
+              <td colspan="3">
+                <div class="empty-state">
+                  <mat-icon>location_off</mat-icon>
+                  <span>No stops found</span>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngFor="let s of filteredStops; trackBy: trackByStopId">
+              <td>
+                <div class="stop-name-cell">
+                  <strong>{{ s.stopName }}</strong>
+                  <span class="stop-id">#{{ s.stopId }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="coordinate-pair">
+                  {{ s.latitude | number:'1.4-4' }}, {{ s.longitude | number:'1.4-4' }}
+                </span>
+              </td>
+              <td class="actions-col">
+                <div class="row-actions">
+                  <button class="icon-action" type="button" (click)="focusStop(s)" matTooltip="Focus on map">
+                    <mat-icon>my_location</mat-icon>
+                  </button>
+                  <button class="icon-action edit" type="button" (click)="editStop(s)" matTooltip="Edit stop">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button class="icon-action danger" type="button" (click)="deleteStop(s.stopId)" matTooltip="Delete stop">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+</div>

@@ -1,0 +1,203 @@
+<div class="overlay">
+  <div class="seat-editor">
+
+    <!-- HEADER -->
+    <div class="editor-header">
+      <h3>Passenger Details</h3>
+      <button class="close-btn" (click)="close()">×</button>
+    </div>
+
+    <!-- CONTACT SECTION -->
+    <div class="form-grid two contact-section">
+
+      <!-- EMAIL -->
+      <div>
+        <input
+          placeholder="Email *"
+          [(ngModel)]="bookingEmail"
+          (blur)="markTouched('email')"
+          (keydown.space)="$event.preventDefault()"
+          [class.error]="touchedFields['email'] && (!bookingEmail || !emailRegex.test(bookingEmail))"
+        >
+
+        <div class="field-error"
+             *ngIf="touchedFields['email'] && (!bookingEmail || !emailRegex.test(bookingEmail))">
+          Valid email is required
+        </div>
+      </div>
+
+      <!-- PHONE -->
+      <div>
+        <input
+          type="text"
+          [(ngModel)]="bookingPhone"
+          maxlength="13"
+          (blur)="markTouched('phone')"
+          (keydown)="lockPhonePrefix($event)"
+          (keypress)="allowOnlyPhoneDigits($event)"
+          (input)="sanitizePhone()"
+          [class.error]="touchedFields['phone'] && !phoneRegex.test(bookingPhone.substring(3))"
+        >
+
+        <div class="field-error"
+             *ngIf="touchedFields['phone'] && !phoneRegex.test(bookingPhone.substring(3))">
+          Phone must contain 10 digits
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PASSENGER CARDS -->
+    <div class="passenger-card" *ngFor="let p of passengers">
+
+      <div class="seat-badge">
+        Seat {{ p.seatNumber }}
+      </div>
+
+      <!-- NAME -->
+      <div class="form-grid two">
+
+        <!-- FIRST NAME -->
+        <div>
+          <input
+            placeholder="First Name *"
+            [(ngModel)]="p.firstName"
+            (blur)="markTouched('first'+p.seatNumber)"
+            (keypress)="allowOnlyNameCharacters($event)"
+            (ngModelChange)="p.firstName = sanitizeName(p.firstName)"
+            [class.error]="touchedFields['first'+p.seatNumber] && isInvalidFirstName(p)"
+          >
+
+          <div class="field-error"
+               *ngIf="touchedFields['first'+p.seatNumber] && isInvalidFirstName(p)">
+            Only alphabets allowed
+          </div>
+        </div>
+
+        <!-- LAST NAME -->
+        <div>
+          <input
+            placeholder="Last Name *"
+            [(ngModel)]="p.lastName"
+            (blur)="markTouched('last'+p.seatNumber)"
+            (keypress)="allowOnlyNameCharacters($event)"
+            (ngModelChange)="p.lastName = sanitizeName(p.lastName)"
+            [class.error]="touchedFields['last'+p.seatNumber] && isInvalidLastName(p)"
+          >
+
+          <div class="field-error"
+               *ngIf="touchedFields['last'+p.seatNumber] && isInvalidLastName(p)">
+            Only alphabets allowed
+          </div>
+        </div>
+
+      </div>
+
+      <!-- AGE + GENDER -->
+      <div class="form-grid two">
+
+        <!-- AGE -->
+        <div>
+          <input
+            type="number"
+            placeholder="Age *"
+            min="1"
+            max="120"
+            [(ngModel)]="p.age"
+            (blur)="markTouched('age'+p.seatNumber)"
+            [class.error]="touchedFields['age'+p.seatNumber] && isInvalidAge(p)"
+          >
+
+          <div class="field-error"
+               *ngIf="touchedFields['age'+p.seatNumber] && isInvalidAge(p)">
+            Age must be between 1 and 120
+          </div>
+        </div>
+
+        <!-- GENDER -->
+        <div>
+          <select
+            [(ngModel)]="p.gender"
+            (blur)="markTouched('gender'+p.seatNumber)"
+            [class.error]="touchedFields['gender'+p.seatNumber] && !p.gender"
+          >
+
+            <option value="">Gender</option>
+
+            <option value="Male"
+                    [disabled]="p.restrictedGender && p.restrictedGender !== 'Male'">
+              Male
+            </option>
+
+            <option value="Female"
+                    [disabled]="p.restrictedGender && p.restrictedGender !== 'Female'">
+              Female
+            </option>
+
+          </select>
+
+          <div class="field-error"
+               *ngIf="touchedFields['gender'+p.seatNumber] && !p.gender">
+            Gender is required
+          </div>
+        </div>
+
+      </div>
+
+      <!-- AADHAAR -->
+      <div class="form-grid one">
+        <div>
+
+          <input
+            type="text"
+            placeholder="Aadhar Number *"
+            maxlength="12"
+            inputmode="numeric"
+            [(ngModel)]="p.uniqueIdentityNumber"
+            (blur)="markTouched('aadhaar'+p.seatNumber)"
+            (keypress)="allowOnlyNumbers($event)"
+            (paste)="blockNonNumericPaste($event)"
+            (ngModelChange)="onIdentityChange()"
+            [class.error]="
+              (touchedFields['aadhaar'+p.seatNumber] && isInvalidIdentity(p))
+              || isDuplicateIdentity(p)
+            "
+          >
+
+          <!-- FORMAT ERROR -->
+          <div class="field-error"
+               *ngIf="touchedFields['aadhaar'+p.seatNumber] && isInvalidIdentity(p)">
+            Identity number must be exactly 12 digits
+          </div>
+
+          <!-- DUPLICATE ERROR -->
+          <div class="field-error"
+               *ngIf="isDuplicateIdentity(p)">
+            Identity number already used for another passenger
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="form-actions d-flex">
+
+      <button
+        class="dashboard-btn primary"
+        (click)="confirmBooking()">
+        Confirm Booking
+      </button>
+
+      <button
+        class="dashboard-btn primary"
+        type="button"
+        (click)="clearForm()">
+        Clear
+      </button>
+
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,12 @@
+country code and 12 digits 
+constraints
+comments
+Description max,
+table names tbl_table name
+check constraint in price
+and >0
+
+validations in passengers
+
+varchar() length.
+nvarchar() for comments

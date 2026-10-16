@@ -1,0 +1,81 @@
+<div class="page container mt-4">
+ <span> <button class="dashboard-btn mb-3" (click)="goBack()">Back</button></span>
+  <h2 class="brand mb-4">Manage Vehicle Instances</h2>
+  <!-- LOADING -->
+  <p *ngIf="loading" class="text-search">
+    Loading instances...
+  </p>
+  <!-- EMPTY -->
+  <p *ngIf="!loading && vehicleInstances.length === 0"
+     class="text-search">
+    No vehicle instances found.
+  </p>
+  <!-- TABLE -->
+  <div *ngIf="!loading && vehicleInstances.length > 0">
+    <table class="vehicle-table">
+      <thead>
+        <tr>
+          <th>Route</th>
+          <th>Departure</th>
+          <th>Arrival</th>
+          <th>Seats</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let i of vehicleInstances">
+
+          <!-- ROUTE NAME -->
+          <td>
+            {{ routeMap[i.routeId] || ('Route #' + i.routeId) }}
+          </td>
+
+          <td>
+            {{ i.departureDate | date:'dd MMM yyyy' }}<br />
+            {{ i.departureTime }}
+          </td>
+
+          <td>
+            {{ i.arrivalDate | date:'dd MMM yyyy' }}<br />
+            {{ i.arrivalTime }}
+          </td>
+
+          <td>
+            {{ i.availableSeats }} / {{ i.totalSeats }}
+          </td>
+
+          <td>
+            <span [ngClass]="{
+              'active': i.status === 'Scheduled',
+              'pending': i.status === 'Delayed',
+              'rejected': i.status === 'Cancelled',
+              'completed':i.status==='Completed'
+            }">
+              {{ i.status }}
+            </span>
+          </td>
+
+          <td>
+            <button class="icons"
+                    matTooltip="Edit Instance"
+                    (click)="editInstance(i.instanceId)">
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <button class="icons"
+                    style="color:red"
+                    matTooltip="Deactivate Instance"
+                    (click)="confirmDelete(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+</div>

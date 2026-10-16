@@ -1,0 +1,131 @@
+x-api-environment: &api-environment
+  ASPNETCORE_URLS: http://+:8080
+  ASPNETCORE_ENVIRONMENT: Docker
+  Jwt__Key: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in your local .env file}
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQL_SA_PASSWORD:?Set SQL_SA_PASSWORD in your local .env file}
+    ports:
+      - "1433:1433"
+    volumes:
+      - endavay-sql:/var/opt/mssql
+
+  identity-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: src/services/Identity/Navoyage.Identity.Api/Navoyage.Identity.Api.csproj
+        SERVICE_DLL: Navoyage.Identity.Api.dll
+    environment:
+      <<: *api-environment
+      ConnectionStrings__IdentityConnection: "Server=sqlserver,1433;Database=EndaVay_Identity;User Id=sa;Password=${SQL_SA_PASSWORD:?Set SQL_SA_PASSWORD in your local .env file};TrustServerCertificate=True;Encrypt=False;"
+    ports:
+      - "5101:8080"
+    depends_on:
+      - sqlserver
+
+  booking-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: src/services/Booking/Navoyage.Booking.Api/Navoyage.Booking.Api.csproj
+        SERVICE_DLL: Navoyage.Booking.Api.dll
+    environment:
+      <<: *api-environment
+      ConnectionStrings__BookingConnection: "Server=sqlserver,1433;Database=EndaVay_Booking;User Id=sa;Password=${SQL_SA_PASSWORD:?Set SQL_SA_PASSWORD in your local .env file};TrustServerCertificate=True;Encrypt=False;"
+      Razorpay__Key: ${RAZORPAY_KEY_ID:-}
+      Razorpay__Secret: ${RAZORPAY_KEY_SECRET:-}
+    ports:
+      - "5102:8080"
+    depends_on:
+      - sqlserver
+
+  fleet-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: src/services/Fleet/Navoyage.Fleet.Api/Navoyage.Fleet.Api.csproj
+        SERVICE_DLL: Navoyage.Fleet.Api.dll
+    environment:
+      <<: *api-environment
+      ConnectionStrings__FleetConnection: "Server=sqlserver,1433;Database=EndaVay_Fleet;User Id=sa;Password=${SQL_SA_PASSWORD:?Set SQL_SA_PASSWORD in your local .env file};TrustServerCertificate=True;Encrypt=False;"
+    ports:
+      - "5103:8080"
+    depends_on:
+      - sqlserver
+
+  catalog-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: src/services/Catalog/Navoyage.Catalog.Api/Navoyage.Catalog.Api.csproj
+        SERVICE_DLL: Navoyage.Catalog.Api.dll
+    environment:
+      <<: *api-environment
+      ConnectionStrings__CatalogConnection: "Server=sqlserver,1433;Database=EndaVay_Catalog;User Id=sa;Password=${SQL_SA_PASSWORD:?Set SQL_SA_PASSWORD in your local .env file};TrustServerCertificate=True;Encrypt=False;"
+    ports:
+      - "5104:8080"
+    depends_on:
+      - sqlserver
+
+  engagement-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: src/services/Engagement/Navoyage.Engagement.Api/Navoyage.Engagement.Api.csproj
+        SERVICE_DLL: Navoyage.Engagement.Api.dll
+    environment:
+      <<: *api-environment
+      ConnectionStrings__EngagementConnection: "Server=sqlserver,1433;Database=EndaVay_Engagement;User Id=sa;Password=${SQL_SA_PASSWORD:?Set SQL_SA_PASSWORD in your local .env file};TrustServerCertificate=True;Encrypt=False;"
+    ports:
+      - "5105:8080"
+    depends_on:
+      - sqlserver
+
+  ai-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: src/services/Ai/Navoyage.Ai.Api/Navoyage.Ai.Api.csproj
+        SERVICE_DLL: Navoyage.Ai.Api.dll
+    environment:
+      <<: *api-environment
+      Gemini__ApiKey: ${GEMINI_API_KEY:-}
+      Unsplash__AccessKey: ${UNSPLASH_ACCESS_KEY:-}
+    ports:
+      - "5106:8080"
+    depends_on:
+      - sqlserver
+
+  gateway-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        SERVICE_PROJECT: src/services/Gateway/Navoyage.Gateway.Api/Navoyage.Gateway.Api.csproj
+        SERVICE_DLL: Navoyage.Gateway.Api.dll
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Docker
+    ports:
+      - "5000:8080"
+    depends_on:
+      - identity-api
+      - booking-api
+      - fleet-api
+      - catalog-api
+      - engagement-api
+      - ai-api
+
+volumes:
+  endavay-sql:

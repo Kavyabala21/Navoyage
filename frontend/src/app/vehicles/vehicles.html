@@ -1,0 +1,164 @@
+<div class="container mt-4">
+
+  <button class="dashboard-btn mb-3" (click)="gotohome()">
+    Back
+  </button>
+  <!-- ================= ADD VEHICLE ======================== -->
+  <div *ngIf="isAddVehicle">
+    <h2>Add Vehicle</h2>
+    <div class="card p-4">
+      <!-- Vehicle Code -->
+      <label>Vehicle Code *</label>
+      <input class="form-control"
+             [(ngModel)]="vehicleCode"
+             (blur)="validateVehicleCode()" />
+      <div class="text-danger" *ngIf="vehicleCodeError">
+        {{ vehicleCodeError }}
+      </div>
+      <small class="text-muted d-block mt-1" *ngIf="vehicleCodeExample">
+  {{ vehicleCodeExample }}
+</small>
+      <!-- Vehicle Model -->
+      <label class="mt-3">Vehicle Model *</label>
+      <input class="form-control"
+             [(ngModel)]="vehicleModel"
+             (blur)="validateVehicleModel()" />
+      <div class="text-danger" *ngIf="vehicleModelError">
+        {{ vehicleModelError }}
+      </div>
+      <!-- Capacity -->
+      <label class="mt-3">Capacity *</label>
+      <input type="number"
+             class="form-control"
+             [(ngModel)]="capacity"
+             (blur)="validateCapacity()" />
+      <div class="text-danger" *ngIf="capacityError">
+        {{ capacityError }}
+      </div>
+      <!-- Description -->
+      <label class="mt-3">Description</label>
+      <textarea class="form-control"
+                rows="3"
+                [(ngModel)]="description"></textarea>
+      <!-- Image -->
+      <label class="mt-3">Vehicle Image (JPG / PNG)</label>
+      <input type="file"
+             class="form-control"
+             accept=".jpg,.jpeg,.png"
+             (change)="onVehicleImageSelect($event)" />
+      <button class="dashboard-btn mt-4"
+              [disabled]="loading"
+              (click)="addVehicle()">
+        {{ loading ? 'Saving...' : 'Add Vehicle' }}
+      </button>
+    </div>
+  </div>
+  <!-- =========== DOCUMENT UPLOAD AFTER ADD =============== -->
+  <div *ngIf="showDocumentForm" class="card p-4 mt-4">
+    <h3>Upload Vehicle Document</h3>
+    <label>Document Name *</label>
+    <input class="form-control"
+           [(ngModel)]="documentName"
+           (blur)="validateDocumentName()" />
+    <div class="text-danger" *ngIf="documentNameError">
+      {{ documentNameError }}
+    </div>
+    <label class="mt-3">Select File (PDF / ZIP) *</label>
+    <input type="file"
+           class="form-control"
+           accept=".pdf,.zip"
+           (change)="onDocumentSelect($event)" />
+    <div class="text-danger" *ngIf="documentFileError">
+      {{ documentFileError }}
+    </div>
+    <button class="dashboard-btn mt-4"
+            (click)="uploadDocument()">
+      Upload Document
+    </button>
+  </div>
+  <!-- ================= EDIT VEHICLE ======================= -->
+  <div *ngIf="isEditVehicle">
+    <h2>Edit Vehicle</h2>
+    <div class="card p-4">
+      <label>Vehicle Code</label>
+      <input class="form-control"
+             [(ngModel)]="vehicleCode"
+             disabled />
+      <label class="mt-3">Vehicle Model</label>
+      <input class="form-control"
+             [(ngModel)]="vehicleModel"
+             disabled />
+      <label class="mt-3">Capacity *</label>
+      <input type="number"
+             class="form-control"
+             [(ngModel)]="capacity"
+             (blur)="validateCapacity()" max(50)/>
+      <div class="text-danger" *ngIf="capacityError">
+        {{ capacityError }}
+      </div>
+      <label class="mt-3">Description</label>
+      <textarea class="form-control"
+                [(ngModel)]="description"
+                ></textarea>
+      <label class="mt-3">Update Image (JPG / PNG)</label>
+      <input type="file"
+             class="form-control"
+             accept=".jpg,.jpeg,.png"
+             (change)="onVehicleImageSelect($event)" />
+      <div class="text-danger" *ngIf="vehicleImageError">
+        {{ vehicleImageError }}
+      </div>
+      <button class="dashboard-btn mt-4"
+              (click)="updateVehicle()">
+        Update Vehicle
+      </button>
+    </div>
+  </div>
+  <!-- ================= DOCUMENT MODE ====================== -->
+  <div *ngIf="isDocumentMode">
+    <h2>Vehicle Documents</h2>
+    <div class="card p-4">
+      <h4>Existing Documents</h4>
+      <div *ngIf="existingDocuments.length === 0">
+        No documents uploaded.
+      </div>
+      <div *ngFor="let doc of existingDocuments"
+           class="border p-3 mb-2">
+        <strong>{{ doc.documentName }}</strong>
+        <div class="mt-2">
+          <!-- VIEW -->
+          <button class="btn btn-sm btn-info me-2"
+                  (click)="viewDocument(doc)">
+            View
+          </button>
+          <!-- DOWNLOAD -->
+          <button class="btn btn-sm btn-primary"
+                  (click)="downloadDocument(doc)">
+            Download
+          </button>
+        </div>
+      </div>
+      <hr>
+      <h5>Add New Document</h5>
+      <label>Document Name *</label>
+      <input class="form-control"
+             [(ngModel)]="documentName"
+             (blur)="validateDocumentName()" />
+      <div class="text-danger" *ngIf="documentNameError">
+        {{ documentNameError }}
+      </div>
+      <label class="mt-3">Select File (PDF / ZIP) *</label>
+      <input type="file"
+             class="form-control"
+             accept=".pdf,.zip"
+             (change)="onDocumentSelect($event)" />
+      <div class="text-danger" *ngIf="documentFileError">
+        {{ documentFileError }}
+      </div>
+      <button class="dashboard-btn mt-4"
+              (click)="uploadDocument()">
+        Upload Document
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="container mt-4">
+  <button class="dashboard-btn mb-3" (click)="goBack()">Back</button>
+  <h2 class="brand mb-4">
+    {{ isEditMode ? 'Edit Vehicle Instance' : 'Add Vehicle Instance' }}
+  </h2>
+  <form #instanceForm="ngForm" (ngSubmit)="submit()">
+    <!-- ROUTE -->
+    <div class="form-group">
+      <label>Route</label>
+      <select name="routeId"
+              [(ngModel)]="model.routeId"
+              required>
+        <option value="">Select Route</option>
+        <option *ngFor="let r of routes" [value]="r.routeId">
+          {{ r.routeName }}
+        </option>
+      </select>
+    </div>
+    <!-- DEPARTURE DATE -->
+    <div class="form-group">
+      <label>Departure Date</label>
+      <input type="date"
+             name="departureDate"
+             [(ngModel)]="model.departureDate"
+             [min]="today"
+             required
+             (change)="validateDates()" />
+    </div>
+    <!-- DEPARTURE TIME -->
+    <div class="form-group">
+      <label>Departure Time</label>
+      <input type="time"
+             name="departureTime"
+             [(ngModel)]="model.departureTime"
+             required
+             (change)="validateDates()" />
+    </div>
+    <!-- ARRIVAL DATE -->
+    <div class="form-group">
+      <label>Arrival Date</label>
+      <input type="date"
+             name="arrivalDate"
+             [(ngModel)]="model.arrivalDate"
+             [min]="model.departureDate || today"
+             required
+             (change)="validateDates()" />
+    </div>
+    <!-- ARRIVAL TIME -->
+    <div class="form-group">
+      <label>Arrival Time</label>
+      <input type="time"
+             name="arrivalTime"
+             [(ngModel)]="model.arrivalTime"
+             required
+             (change)="validateDates()" />
+    </div>
+    <!-- TOTAL SEATS -->
+    <div class="form-group">
+      <label>Total Seats</label>
+      <input type="number"
+             name="totalSeats"
+             [(ngModel)]="model.totalSeats"
+             readonly />
+    </div>
+    <!-- AVAILABLE SEATS -->
+    <div class="form-group">
+      <label>Available Seats</label>
+      <input type="number"
+             name="availableSeats"
+             [(ngModel)]="model.availableSeats"
+             min="0"
+             [max]="model.totalSeats"
+             required
+             (input)="validateAvailableSeats()" />
+    </div>
+    <!-- STATUS -->
+    <div class="form-group">
+      <label>Status</label>
+      <select name="status"
+              [(ngModel)]="model.status"
+              required>
+        <option value="Scheduled">Scheduled</option>
+        <option value="Delayed">Delayed</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+    </div>
+    <!-- ERRORS -->
+    <p class="error" *ngIf="dateError">
+      Arrival date & time must be after departure
+    </p>
+    <p class="error" *ngIf="seatError">
+      Available seats cannot be greater than total seats
+    </p>
+    <!-- SUBMIT -->
+    <button class="dashboard-btn"
+            type="submit"
+            [disabled]="instanceForm.invalid || dateError || seatError">
+      {{ isEditMode ? 'Update Instance' : 'Add Instance' }}
+    </button>
+  </form>
+</div>

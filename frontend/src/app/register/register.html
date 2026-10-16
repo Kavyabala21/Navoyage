@@ -1,0 +1,138 @@
+<!-- REGISTER PAGE -->
+<div class="auth-wrapper">
+  <div class="auth-card glass">
+
+    <!-- LOGO -->
+    <div class="text-center mb-0">
+      <img src="Assets/Images/NavoyageWCLogo.png" class="logo-img" alt="Navoyage logo" />
+      <h2 class="brand">
+        Na<span class="brand-v">voyage</span>
+      </h2>
+      <p class="subtitle">Create your account</p>
+    </div>
+
+    <!-- ================= ROLE SELECTION ================= -->
+    <div *ngIf="!selectedRole" class="text-center mt-2">
+
+
+      <button class="btn-primary d-block mx-auto w-75 mb-2" type="button" (click)="selectRole('Customer')">
+        Register as Customer
+      </button>
+
+      <button class="btn-primary d-block mx-auto w-75" type="button" (click)="selectRole('TravelCompanyOwner')">
+        Register Travel Company
+      </button>
+
+      <div class="text-center mt-1">
+        <p class="m-0">
+          Already have an account?
+          <a class="account-link" (click)="gotoLogin()">Login</a>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ================= FORM ================= -->
+    <form *ngIf="selectedRole" [formGroup]="form" (ngSubmit)="onRegister()" autocomplete="on" novalidate>
+
+      <!-- FULL NAME -->
+      <div class="form-group d-block mx-auto w-75">
+        <div class="input-wrapper">
+          <input type="text" name="username" placeholder="User Name" formControlName="fullName" minlength="3"
+            maxlength="50" autocomplete="username" (keypress)="allowUsernameCharacters($event)">
+        </div>
+
+        <small class="error" *ngIf="fieldError('fullName')">
+          {{ fieldError('fullName') }}
+        </small>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="form-group d-block mx-auto w-75">
+        <div class="input-wrapper">
+          <input type="email" name="email" formControlName="email" [placeholder]="selectedRole === 'TravelCompanyOwner'
+    ? 'Enter company email'
+    : 'Enter email'" autocomplete="email" inputmode="email" (keydown.space)="$event.preventDefault()" />
+        </div>
+        <small class="error" *ngIf="fieldError('email')">
+          {{ fieldError('email') }}
+        </small>
+      </div>
+      <!-- PHONE -->
+      <div class="form-group d-block w-75 mx-auto">
+
+        <div class="form-group d-block mx-auto">
+
+          <div class="input-wrapper">
+
+            <input type="tel" name="tel" formControlName="localPhone" maxlength="14" autocomplete="tel"
+              inputmode="numeric" (input)="sanitizePhone()" (keydown)="preventPrefixDelete($event)" />
+
+          </div>
+
+          <small class="error" *ngIf="fieldError('localPhone')">
+            {{ fieldError('localPhone') }}
+          </small>
+
+        </div>
+
+      </div>
+      <!-- PASSWORD -->
+      <div class="d-flex gap-1 form-group mx-auto w-75">
+
+        <!-- PASSWORD -->
+        <div class="form-group w-50">
+          <div class="input-wrapper password-wrapper">
+
+            <input [type]="showPassword ? 'text' : 'password'" name="new-password" formControlName="password"
+              (keydown)="blockSpaces($event)" placeholder="Enter password" autocomplete="new-password"
+              class="form-input" />
+
+            <span class="toggle-icon" (click)="togglePassword()">
+              <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+
+          </div>
+
+          <small class="error" *ngIf="fieldError('password')">
+            {{ fieldError('password') }}
+          </small>
+        </div>
+
+
+        <!-- CONFIRM PASSWORD -->
+        <div class="form-group w-50">
+          <div class="input-wrapper password-wrapper">
+
+            <input [type]="showConfirmPassword ? 'text' : 'password'" name="confirm-new-password"
+              formControlName="confirmPassword" placeholder="Confirm password" autocomplete="new-password"
+              class="form-input" />
+
+            <span class="toggle-icon" (click)="toggleConfirmPassword()">
+              <i class="fa-solid" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+
+          </div>
+
+          <small class="error" *ngIf="fieldError('confirmPassword')">
+            {{ fieldError('confirmPassword') }}
+          </small>
+        </div>
+
+      </div>
+      <!-- REGISTER -->
+      <button class="btn-primary d-block mx-auto w-25 m-0" type="submit">
+        REGISTER
+      </button>
+
+      <!-- CHANGE ROLE -->
+      <div class="text-center mt-1">
+        <a class="account-link" (click)="selectedRole = null">
+          Change account type
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+</div>

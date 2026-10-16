@@ -1,0 +1,244 @@
+{
+  "Booking": {
+    "NotFound": "Booking not found.",
+    "PassengerRequired": "At least one passenger is required.",
+    "MaxPassengerLimit": "Maximum 6 passengers allowed.",
+    "InvalidAmount": "Invalid total amount.",
+    "InvalidInstance": "Invalid vehicle instance.",
+    "Unauthorized": "Unauthorized access.",
+    "AlreadyCancelled": "Booking already cancelled.",
+    "Created": "Booking Successfull.",
+    "CreatedConfirmed": "Your booking (PNR: {PNR}) is confirmed.",
+    "CreatedWithWaiting": "Your booking (PNR: {PNR}) is created. Some passengers are in waiting list.",
+    "CancelledTitle": "Booking Cancelled",
+    "CancelledMessage": "Your booking (PNR: {PNR}) has been cancelled.",
+    "RefundTitle": "Refund Initiated",
+    "RefundMessage": "Refund has been initiated for booking PNR: {PNR}.",
+    "SeatConfirmedTitle": "Seat Confirmed",
+    "SeatConfirmedMessage": "Good news! Your waiting list seat has been confirmed.",
+    "BookingsFound": "Bookings retrieved successfully.",
+    "BookingFound": "Booking retrieved successfully.",
+    "DuplicatePassenger": "A passenger with same Aadhar number already existed in this vehicle.",
+    "TripCancelledTitle": "Trip Cancelled",
+    "TripCancelledMessage": "Your trip (PNR {PNR}) has been cancelled. Refund of ₹{AMOUNT} has been initiated."
+  },
+
+  "Passenger": {
+    "NotFound": "Passenger not found.",
+    "AlreadyCancelled": "Passenger already cancelled.",
+    "BookingNotFound": "Booking not found.",
+    "Unauthorized": "Unauthorized cancellation.",
+    "InstanceNotFound": "Vehicle instance not found.",
+    "SeatConfirmedTitle": "Seat Confirmed",
+    "SeatConfirmedMessage": "Good news! A seat has been confirmed from the waiting list.",
+    "BookingCancelledTitle": "Booking Cancelled",
+    "BookingCancelledMessage": "All passengers in your booking have been cancelled. The booking is now cancelled.",
+    "PassengerCancelledTitle": "Passenger Cancelled",
+    "PassengerCancelledMessage": "A passenger in your booking has been cancelled successfully."
+  },
+
+  "Payment": {
+    "BookingNotFound": "Booking not found.",
+    "PaymentNotFound": "Payment not found.",
+    "AlreadyCompleted": "Payment already completed.",
+    "RefundOnlySuccess": "Refund allowed only for successful payments.",
+    "SuccessTitle": "Payment Successful",
+    "SuccessMessage": "Your payment for booking {PNR} was successful. Seats have been allocated.",
+    "FailedTitle": "Payment Failed",
+    "FailedMessage": "Payment failed for booking {PNR}. Please try again.",
+    "RefundTitle": "Refund Processed",
+    "RefundMessage": "A refund of ₹{Amount} has been processed for booking {PNR}.",
+    "Initiated": "Payment initiated successfully."
+  },
+
+  "Pricing": {
+    "NotFound": "Pricing not found.",
+    "InvalidBasePrice": "Base price must be greater than zero.",
+    "InvalidEffectiveDates": "EffectiveTo cannot be before EffectiveFrom.",
+    "AddedTitle": "Pricing Added",
+    "AddedMessage": "Pricing for {SeatClass} has been added successfully.",
+    "UpdatedTitle": "Pricing Updated",
+    "UpdatedMessage": "Pricing for {SeatClass} has been updated successfully.",
+    "Retrieved": "Pricing retrieved successfully."
+  },
+
+  "Review": {
+    "DataRequired": "Review data is required.",
+    "InvalidBooking": "Invalid booking.",
+    "InvalidRating": "Rating must be between 1 and 5.",
+    "BookingNotFound": "Booking not found.",
+    "UnauthorizedReview": "You can review only your bookings.",
+    "UnconfirmedBooking": "Cannot review an unconfirmed booking.",
+    "AlreadyExists": "Review already exists for this booking.",
+    "InvalidReviewId": "Invalid review id.",
+    "ReviewNotFound": "Review not found.",
+    "InvalidUser": "Invalid user.",
+    "InvalidVehicle": "Invalid vehicle.",
+    "SubmittedTitle": "Review Submitted",
+    "SubmittedMessage": "Thank you for rating your journey!",
+    "Retrieved": "Review retrieved successfully.",
+    "UserReviewsRetrieved": "User reviews retrieved successfully.",
+    "VehicleReviewsRetrieved": "Vehicle reviews retrieved successfully.",
+    "BookingReviewsRetrieved": "Booking reviews retrieved successfully.",
+    "AverageRatingRetrieved": "Average rating retrieved successfully.",
+    "Deleted": "Review deleted successfully."
+  },
+
+  "Route": {
+    "DataRequired": "Route data is required.",
+    "NotFound": "Route not found.",
+    "AddedTitle": "Route Added",
+    "AddedMessage": "Route '{RouteName}' has been added successfully.",
+    "UpdatedTitle": "Route Updated",
+    "UpdatedMessage": "Route '{RouteName}' has been updated successfully.",
+    "DeletedTitle": "Route Deleted",
+    "DeletedMessage": "Route '{RouteName}' has been deleted successfully.",
+    "Retrieved": "Route retrieved successfully.",
+    "RetrievedAll": "Routes retrieved successfully.",
+    "InstanceExists": "Can't update.An isntace exists for this Route.",
+    "Can'tDelete": "Can't Delete. An instance exists for this route."
+  },
+
+  "RouteStopPoint": {
+    "InvalidData": "Invalid route stop point data.",
+    "RouteNotFound": "Route not found.",
+    "NotFound": "Route stop point not found.",
+    "SequenceExists": "Sequence order already exists for this route.",
+    "AddedTitle": "Route Stop Added",
+    "AddedMessage": "A new stop point has been added to route '{RouteName}'.",
+    "UpdatedTitle": "Route Stop Updated",
+    "UpdatedMessage": "A stop point has been updated for route '{RouteName}'.",
+    "DeletedTitle": "Route Stop Deleted",
+    "DeletedMessage": "A stop point has been removed from route '{RouteName}'.",
+    "Retrieved": "Route stop point retrieved successfully.",
+    "RetrievedAll": "Route stop points retrieved successfully."
+  },
+
+  "SeatLayout": {
+    "LayoutNotFound": "Seat layout not found.",
+    "VehicleNotFound": "Vehicle not found.",
+    "InvalidJson": "Invalid layout JSON.",
+    "SeatNotFound": "Seat not found.",
+    "LayoutNotExists": "Seat layout does not exist for this vehicle.",
+    "CreatedTitle": "Seat Layout Created",
+    "CreatedMessage": "Seat layout has been created for vehicle code {VehicleCode}.",
+    "UpdatedTitle": "Seat Layout Updated",
+    "UpdatedMessage": "Seat layout has been updated for vehicle code {VehicleCode}.",
+    "SeatPriceUpdatedTitle": "Seat Price Updated",
+    "SeatPriceUpdatedMessage": "Seat price updated for seat {SeatNo} in vehicle code {VehicleCode}.",
+    "Retrieved": "Seat layout retrieved successfully."
+  },
+
+  "Stop": {
+    "NotFound": "Stop not found.",
+    "AlreadyExists": "Stop name already exists.",
+    "CreatedTitle": "Stop Created",
+    "CreatedMessage": "Stop '{StopName}' has been created successfully.",
+    "UpdatedTitle": "Stop Updated",
+    "UpdatedMessage": "Stop '{StopName}' has been updated successfully.",
+    "DeletedTitle": "Stop Deleted",
+    "DeletedMessage": "Stop '{StopName}' has been deleted successfully.",
+    "RetrievedAll": "Stops retrieved successfully.",
+    "Retrieved": "Stop retrieved successfully.",
+    "Can'tDelete": "Can't Delete. A route contains this stop point.",
+    "Can'tUpdate": "Can't Update. A route contains this stop point."
+  },
+
+  "TravelCompany": {
+    "NameRequired": "Company name is required.",
+    "AlreadyExists": "Travel company already exists for this user.",
+    "NotFound": "Travel Company not found.",
+    "AlreadyDeactivated": "Company is already deactivated.",
+    "CreatedTitle": "Company Created",
+    "CreatedMessage": "Your travel company '{CompanyName}' has been created successfully.",
+    "UpdatedTitle": "Company Updated",
+    "UpdatedMessage": "Company '{CompanyName}' has been updated successfully.",
+    "DeactivatedTitle": "Company Deactivated",
+    "DeactivatedMessage": "Company '{CompanyName}' has been deactivated.",
+    "Retrieved": "Company retrieved successfully.",
+    "RetrievedAll": "Companies retrieved successfully.",
+    "NotAllowed": "You are not allowed to do this operation."
+  },
+
+  "User": {
+    "NotFound": "User not found.",
+    "InvalidCredentials": "Invalid login credentials.",
+    "InvalidPassword": "Invalid password.",
+    "Inactive": "User account is inactive.",
+    "ProfileUpdatedTitle": "Profile Updated",
+    "ProfileUpdatedMessage": "Your profile has been updated.",
+    "LoginSuccess": "Login successful.",
+    "UsersRetrieved": "Users retrieved successfully.",
+    "UserRetrieved": "User retrieved successfully.",
+    "ProfileRetrieved": "Profile retrieved successfully.",
+    "UserAdded": "User added successfully.",
+    "UserUpdated": "User updated successfully.",
+    "UserStatusUpdated": "User status updated successfully."
+  },
+
+  "VehicleDocument": {
+    "InvalidVehicleId": "Invalid vehicle id.",
+    "InvalidDocumentId": "Invalid document id.",
+    "NotFound": "Document not found.",
+    "VehicleNotFound": "Vehicle not found.",
+    "FileRequired": "File is required.",
+    "NameRequired": "Document name is required.",
+    "InvalidFileType": "Only PDF or ZIP files allowed.",
+    "CannotModifyApproved": "Approved documents cannot be modified.",
+    "InvalidStatus": "Invalid document status.",
+    "UploadedTitle": "Document Uploaded",
+    "UploadedMessage": "Document '{NAME}' has been uploaded and is pending review.",
+    "UpdatedTitle": "Document Updated",
+    "UpdatedMessage": "Vehicle document '{NAME}' has been updated and resubmitted.",
+    "ReviewedTitleApproved": "Document Approved",
+    "ReviewedTitleRejected": "Document Rejected",
+    "ReviewedMessage": "Your document '{NAME}' has been {STATUS}.",
+    "Retrieved": "Document retrieved successfully.",
+    "RetrievedAll": "Documents retrieved successfully.",
+    "VerificationSuccess": "Document verification completed successfully.",
+    "VerificationFailed": "Document verification failed."
+  },
+  "Vehicle": {
+    "NotFound": "Vehicle not found.",
+    "InvalidCompany": "Invalid travel company.",
+    "InvalidImageFormat": "Only JPG or PNG images are allowed.",
+    "DocumentsRequired": "Vehicle documents not uploaded.",
+
+    "AddedTitle": "Vehicle Added",
+    "AddedMessage": "Vehicle {CODE} has been added and is pending approval.",
+
+    "UpdatedTitle": "Vehicle Updated",
+    "UpdatedMessage": "Vehicle {CODE} has been updated successfully.",
+
+    "ApprovedTitle": "Vehicle Approved",
+    "ApprovedMessage": "Your vehicle {CODE} has been approved.",
+
+    "RejectedTitle": "Vehicle Rejected",
+    "RejectedMessage": "Your vehicle {CODE} has been rejected. Please review the remarks.",
+
+    "DeletedTitle": "Vehicle Deleted",
+    "DeletedMessage": "Vehicle {CODE} has been deactivated.",
+
+    "Retrieved": "Vehicles retrieved successfully.",
+    "RetrievedById": "Vehicle retrieved successfully.",
+    "RetrievedByCompany": "Vehicles retrieved successfully."
+  },
+  "VehicleInstance": {
+    "NotFound": "Vehicle instance not found.",
+    "CreatedTitle": "Vehicle Instance Created",
+    "CreatedMessage": "A new vehicle instance has been created for route {ROUTE}.",
+    "UpdatedTitle": "Vehicle Instance Updated",
+    "UpdatedMessage": "Vehicle instance with vehicle code {CODE} has been updated successfully.",
+    "DeletedTitle": "Vehicle Instance Deleted",
+    "DeletedMessage": "Vehicle instance for vehicle code {CODE} has been deactivated.",
+    "Retrieved": "Vehicle instance retrieved successfully.",
+    "RetrievedAll": "Vehicle instances retrieved successfully.",
+    "SearchRetrieved": "Search results retrieved successfully.",
+    "TimeError": "Arrival time must be after departure time.",
+    "InstanceExists": "A vehicle instance already exists in the selected time range.",
+    "Can'tDelete": "Bookings existed for the instance. Can't delete",
+    "Can'tUpdate": "Bookings existed for the instance. Can't Update"
+
+  }
+
+}

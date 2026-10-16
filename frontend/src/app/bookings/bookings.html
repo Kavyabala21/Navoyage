@@ -1,0 +1,171 @@
+<div class="bookings-page">
+
+  <h2 class="heading">My Bookings</h2>
+
+  <p *ngIf="loading">Loading bookings...</p>
+
+  <div *ngIf="!loading && filteredBookings?.length === 0" class="empty-container">
+    <img src="../../Assets/Images/no-bookings.jpg" class="empty-image" alt="No bookings found" />
+
+    <h3>No Bookings Found</h3>
+
+    <p>You have not made any bookings yet.</p>
+
+    <button class="btn-primary mt-2" (click)="gotohome()">
+      Go to Dashboard
+    </button>
+
+  </div>
+  <!-- TABS -->
+  <div class="tabs" *ngIf="!loading && bookings.length > 0">
+    <button [class.active]="activeTab==='upcoming'" (click)="setTab('upcoming')">
+      Not Completed
+    </button>
+
+    <button [class.active]="activeTab==='completed'" (click)="setTab('completed')">
+      Completed
+    </button>
+
+    <button [class.active]="activeTab==='cancelled'" (click)="setTab('cancelled')">
+      Cancelled
+    </button>
+  </div>
+  <div class="booking-card" *ngFor="let b of filteredBookings">
+    <div class="booking-header">
+      <div>
+        <strong>PNR:&nbsp;</strong> {{ b.pnr }} <br>
+        <strong>Status:</strong>
+        <span class="status" [class.completed]="b.status==='Completed'" [class.cancelled]="b.status === 'Cancelled'">{{
+          b.status }}
+        </span>
+      </div>
+
+      <div class="booking-actions">
+        <div><strong>Amount:</strong> ₹{{ b.totalAmount }}</div>
+
+        <div class="booking-actions">
+          <!-- VIEW TICKET -->
+          <button class="btn" (click)="openTicketModal(b)" *ngIf="canCancelBooking(b)" matTooltip="View Ticket">
+            <img src="../../Assets/Icons/visibility.svg">
+          </button>
+          <!-- CANCEL FULL BOOKING -->
+          <button class="btn" *ngIf="canCancelBooking(b)" (click)="cancelBooking(b.bookingId)"
+            matTooltip="Cancel Booking">
+            <img src="../../Assets/Icons/trash.svg">
+          </button>
+
+          <!-- RATE NOW (ONLY IF NO REVIEW) -->
+          <button class="btn" *ngIf="!canCancelBooking(b) && b.status!='Cancelled' && !b.reviewCompleted"
+            (click)="goToReview(b)" matTooltip="Rate Us">
+            <img src="../../Assets/Icons/star.svg">
+          </button>
+
+          <!-- DELETE REVIEW (ONLY IF REVIEW EXISTS) -->
+          <button class="btn" *ngIf="b.reviewCompleted" (click)="deleteReview(b.reviewId)" matTooltip="Delete Review">
+            <img src="../../Assets/Icons/trash.svg">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p *ngIf="b.passengersLoading">Loading passengers...</p>
+
+    <!-- PASSENGER TABLE -->
+    <table class="passenger-table" *ngIf="!b.passengersLoading && b.passengers?.length">
+
+      <thead>
+        <tr>
+          <th>
+            <input type="checkbox" (change)="toggleSelectAll(b, $event)" [disabled]="b.tripStarted">
+          </th>
+          <th>Seat</th>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let p of b.passengers || []">
+          <td>
+            <input type="checkbox" [(ngModel)]="p.selected" [disabled]="p.status !== 'Confirmed' || b.tripStarted">
+          </td>
+          <td>{{ p.seatNumber }}</td>
+          <td>{{ p.firstName }} {{ p.lastName }}</td>
+          <td>{{ p.age || '-' }}</td>
+          <td>{{ p.status }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- CANCEL SELECTED PASSENGERS -->
+    <div *ngIf="hasSelectedPassengers(b)" class="mt-2">
+      <button class="btn" matTooltip="Cancel Passenger's Bookings" [disabled]="b.tripStarted"
+        (click)="cancelSelectedPassengers(b)">
+        <img src="../../Assets/Icons/trash.svg" class="icons">
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ================= TICKET MODAL ================= -->
+
+  <div class="ticket-overlay" *ngIf="showTicketModal">
+
+    <div class="ticket-modal">
+
+      <div class="ticket-header">
+        <h3>Travel Ticket</h3>
+        <button class="close-btn" (click)="closeTicketModal()">×</button>
+      </div>
+
+      <!-- Ticket content captured for PDF -->
+      <div #ticketContent class="ticket-body">
+
+        <h4>PNR: {{ selectedTicket?.pnr }}</h4>
+
+        <p>
+          <strong>Status:</strong> {{ selectedTicket?.status }}
+        </p>
+
+        <p>
+          <strong>Total Amount:</strong> ₹{{ selectedTicket?.totalAmount }}
+        </p>
+
+        <hr>
+
+        <h4>Passengers</h4>
+
+        <table class="ticket-table">
+
+          <thead>
+            <tr>
+              <th>Seat</th>
+              <th>Name</th>
+              <th>Age</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let p of selectedTicket?.passengers">
+              <td>{{ p.seatNumber }}</td>
+              <td>{{ p.firstName }} {{ p.lastName }}</td>
+              <td>{{ p.age }}</td>
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="ticket-actions">
+        <button class="btn-primary" (click)="downloadTicket()">
+          Download PDF
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

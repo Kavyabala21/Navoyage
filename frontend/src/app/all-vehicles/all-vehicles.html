@@ -1,0 +1,145 @@
+<div class="page container mt-4">
+  <!-- BACK -->
+   <span>  <button class="dashboard-btn mb-2" (click)="gotohome()">Back</button>
+</span>
+  <!-- TITLE -->
+  <h2 class="brand mb-4">My Vehicles</h2>
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <input type="text" placeholder="Search by model or code" [(ngModel)]="searchText" (input)="applyFilters()" />
+    <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+      <option value="">All Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+  </div>
+  <!-- LOADING -->
+  <p *ngIf="loading" class="text-search">Loading vehicles...</p>
+  <!-- NO DATA -->
+  <p *ngIf="!loading && filteredVehicles.length === 0" class="text-search">
+    No vehicles found.
+  </p>
+  <!-- VEHICLES TABLE -->
+  <div *ngIf="!loading && filteredVehicles.length > 0">
+    <table class="vehicle-table">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Code</th>
+          <th>Status</th>
+          <th>Vehicle Operations</th>
+          <th *ngIf="modeOfTransport !== 'Train'">Seat Layout</th>
+          <th *ngIf="modeOfTransport === 'Train'">Manage Prices</th>
+          <th>Instance Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of filteredVehicles">
+          <td>{{ v.vehicleModel }}</td>
+          <td>{{ v.vehicleCode }}</td>
+          <td>
+            <span [class.active]="v.isActive" [class.inactive]="!v.isActive">
+              {{ v.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </td>
+          <!-- VEHICLE ACTIONS -->
+          <td>
+            <button class="icons" matTooltip="View Vehicle Details" (click)="openVehicleDetails(v)">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button class="icons" matTooltip="Edit Vehicle" (click)="editVehicle(v.vehicleId)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="icons" matTooltip="Documents" (click)="editDocuments(v.vehicleId)">
+              <mat-icon>description</mat-icon>
+            </button>
+            <button *ngIf="v.isActive" class="icons" style="color:red" matTooltip="Deactivate Vehicle"
+              (click)="confirmDeactivate(v)">
+              <mat-icon>block</mat-icon>
+            </button>
+            <button *ngIf="!v.isActive" class="icons" disabled matTooltip="Vehicle is inactive">
+              <mat-icon>block</mat-icon>
+            </button>
+          </td>
+          <td *ngIf="modeOfTransport !== 'Train'">
+            <div class="action-menu">
+              <button class="icons" [disabled]="!v.isActive || seatLayoutExists[v.vehicleId]" matTooltip="Add Seat Layout"
+                (click)="gotoSeatLayout(v.vehicleId, false)">
+                <mat-icon>add_circle</mat-icon>
+              </button>
+              <button class="icons" [disabled]="!v.isActive || !seatLayoutExists[v.vehicleId]"
+                matTooltip="Edit Seat Layout" (click)="gotoSeatLayout(v.vehicleId, true)">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+          <td *ngIf="modeOfTransport === 'Train'">
+            <button class="icons" [disabled]="!v.isActive" matTooltip="Manage Train Seat Prices"
+              (click)="gotoTrainPrices(v.vehicleId)">
+              <mat-icon>payments</mat-icon>
+            </button>
+            <button class="icons" [disabled]="!v.isActive || !seatLayoutExists[v.vehicleId]"
+              matTooltip="Edit Seat Layout" (click)="gotoTrainPrices(v.vehicleId)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </td>
+          <!-- INSTANCE ACTIONS -->
+          <td>
+            <div class="action-menu">
+              <button class="icons" matTooltip="Manage Instances"
+                [disabled]="!v.isActive || !seatLayoutExists[v.vehicleId]" (click)="manageVehicleInstance(v.vehicleId)">
+                <mat-icon>settings</mat-icon>
+              </button>
+              <button class="icons" matTooltip="Add Instance" [disabled]="!v.isActive || !seatLayoutExists[v.vehicleId]"
+                (click)="addInstance(v.vehicleId)">
+                <mat-icon>add_circle</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- ================= VEHICLE DETAILS MODAL ================= -->
+  <div class="overlay" *ngIf="selectedVehicle">
+    <div class="details-modal" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h3>{{ selectedVehicle?.vehicleModel }}</h3>
+        <button class="icon-btn" (click)="closeModal()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <img class="modal-image" *ngIf="selectedVehicle?.vehicleImageUrl"
+        [src]="getImage(selectedVehicle.vehicleImageUrl)" />
+      <div class="modal-body">
+        <p><strong>Vehicle Code:</strong> {{ selectedVehicle?.vehicleCode }}</p>
+        <p><strong>Travel Company:</strong> {{ selectedVehicle?.travelCompany?.companyName || 'Not available' }}</p>
+        <p *ngIf="selectedVehicle?.travelCompany?.owner">
+          <strong>Owner:</strong>
+          {{ selectedVehicle.travelCompany.owner.fullName || selectedVehicle.travelCompany.owner.name || 'Not available' }}
+        </p>
+        <p *ngIf="selectedVehicle?.travelCompany?.owner?.email">
+          <strong>Owner Email:</strong> {{ selectedVehicle.travelCompany.owner.email }}
+        </p>
+        <p *ngIf="selectedVehicle?.travelCompany?.owner?.phoneNumber">
+          <strong>Owner Phone:</strong> {{ selectedVehicle.travelCompany.owner.phoneNumber }}
+        </p>
+        <p>
+          <strong>Verification status:</strong>
+          <span [ngClass]="{
+              'approved': vehicleDocuments[0]?.status === 'Approved',
+              'pending': vehicleDocuments[0]?.status === 'Pending',
+              'rejected': vehicleDocuments[0]?.status === 'Rejected'
+            }">
+            {{ vehicleDocuments[0]?.status || 'Pending' }}
+          </span>
+        </p>
+        <p>
+          <strong>Status:</strong>
+          {{ selectedVehicle?.isActive ? 'Active' : 'Inactive' }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

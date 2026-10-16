@@ -1,0 +1,203 @@
+<div class="search-layout">
+  <!-- FILTER PANEL -->
+  <aside class="filter-panel">
+    <div class="filter-actions sticky-actions">
+      <button class="filter-btn primary" (click)="applyFilters()">Apply Filters</button>
+      <button class="filter-btn outline" (click)="resetFilters()">Reset</button>
+    </div>
+    <div class="filter-body">
+      <h4>Filters</h4>
+      <label>Journey Date</label>
+      <input type="date" [(ngModel)]="filterDate" [min]="minDate">
+      <label>Min Price</label>
+      <input type="number" name="minPrice" [(ngModel)]="minPrice" #minPriceCtrl="ngModel" min="0"
+        (keydown)="($event.key === '-' ? $event.preventDefault() : null)">
+
+      <div class="field-error" *ngIf="minPriceCtrl.invalid && minPriceCtrl.touched">
+        Minimum price cannot be negative.
+      </div>
+      <div class="field-error" *ngIf="minPrice > maxPrice">
+        Minimum price cannot be greater than Maximum price.
+      </div>
+      <label>Max Price</label>
+      <input type="number" name="maxPrice" [(ngModel)]="maxPrice" #maxPriceCtrl="ngModel" min="0"
+        (keydown)="($event.key === '-' ? $event.preventDefault() : null)">
+
+      <div class="field-error" *ngIf="maxPriceCtrl.invalid && maxPriceCtrl.touched">
+        Maximum price cannot be negative.
+      </div>
+      <label>Minimum Seats</label>
+      <input type="number" name="minSeats" [(ngModel)]="minSeats" #seatCtrl="ngModel" min="1"
+        (keydown)="($event.key === '-' ? $event.preventDefault() : null)">
+
+      <div class="field-error" *ngIf="seatCtrl.invalid && seatCtrl.touched">
+        Seats must be greater than 0.
+      </div>
+      <ng-container *ngIf="transportMode !== 'Train'">
+        <label>Seat Type</label>
+        <select [(ngModel)]="seatType">
+          <option value="">Any</option>
+          <option value="SLEEPER">Sleeper</option>
+          <option value="SEATER">Seater</option>
+        </select>
+      </ng-container>
+      <label *ngIf="transportMode === 'TRAIN'">Coach Type</label>
+      <select *ngIf="transportMode === 'TRAIN'" [(ngModel)]="seatType">
+        <option value="">Any</option>
+        <option value="GENERAL">General</option>
+        <option value="SLEEPER">Sleeper</option>
+        <option value="3AC">3AC</option>
+        <option value="2AC">2AC</option>
+        <option value="1AC">1AC</option>
+      </select>
+      <label>Deck</label>
+      <select [(ngModel)]="seatDeck">
+        <option value="">Any</option>
+        <option value="LOWER">Lower</option>
+        <option value="UPPER">Upper</option>
+      </select>
+      <label>Seat Position</label>
+      <select [(ngModel)]="seatPosition">
+        <option value="">Any</option>
+        <option value="WINDOW">Window</option>
+        <option value="AISLE">Aisle</option>
+      </select>
+      <label>Sort By</label>
+      <select [(ngModel)]="sortBy">
+        <option value="">None</option>
+        <option value="price">Cheapest</option>
+        <option value="departure">Earliest</option>
+      </select>
+    </div>
+  </aside>
+  <!-- CONTENT -->
+  <section class="content-area">
+    <!-- SEARCH BAR -->
+    <div class="search-bar">
+      <input list="fromStops" placeholder="From" [(ngModel)]="fromLocationName">
+      <datalist id="fromStops">
+        <option *ngFor="let s of stops" [value]="s.stopName"></option>
+      </datalist>
+      <input list="toStops" placeholder="To" [(ngModel)]="toLocationName">
+      <datalist id="toStops">
+        <option *ngFor="let s of stops" [value]="s.stopName"></option>
+      </datalist>
+      <input type="date" [(ngModel)]="departureDateFilter" [min]="minDate">
+      <button class="search-btn" (click)="searchByLocations()">
+        <mat-icon>search</mat-icon>
+        Search
+      </button>
+    </div>
+    <!-- RESULTS CONTAINER -->
+    <div class="results-container">
+      <!--  LOADING -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading available services...</p>
+      </div>
+      <!-- CONTENT ONLY WHEN NOT LOADING -->
+      <ng-container *ngIf="!isLoading">
+        <!--  INITIAL STATE -->
+        <div *ngIf="search" class="empty-search-state">
+          <div class="empty-box">
+            <mat-icon class="empty-icon">search</mat-icon>
+            <h3>Search to get results</h3>
+            <p>Select from location, destination and date to view available services.</p>
+          </div>
+        </div>
+        <!-- ACTION BUTTONS -->
+        <div *ngIf="!search" class="action-buttons">
+          <button class="book-btn secondary" (click)="goBack()">Back</button>
+          <button *ngIf="!isLoggedIn" class="book-btn" (click)="goToLogin()">Login to book</button>
+        </div>
+        <div *ngIf="!search && noSearchResults" class="no-results">
+          <img src="../../Assets/Images/no-results.jpg" class="no-results-img" alt="No results">
+          <h3>No {{ transportMode }} services found</h3>
+          <p>
+            No {{ transportMode }} services available from
+            <strong>{{ searchedFrom }}</strong> to
+            <strong>{{ searchedTo }}</strong>
+            on <strong>{{ searchedDate | date:'mediumDate' }}</strong>
+          </p>
+        </div>
+        <!-- INSTANCE CARDS -->
+        <div *ngIf="!search && filteredInstances.length > 0">
+          <div *ngFor="let i of filteredInstances" class="instance-card">
+            <img [src]="backendUrl + i.vehicle?.vehicleImageUrl">
+            <div class="instance-details">
+              <h3>
+                {{ i.vehicle?.vehicleCode }}
+                <span>{{ i.vehicle?.vehicleModel }}</span>
+              </h3>
+              <p class="route">{{ i.route?.routeName }}</p>
+              <p class="time">{{ i.departureDate | date:'mediumDate' }} - {{ i.departureTime }}</p>
+              <p class="availability" [ngClass]="{
+        'high-availability': i.availableSeats > 20,
+        'medium-availability': i.availableSeats > 10 && i.availableSeats <= 20,
+        'low-availability': i.availableSeats <= 10
+      }">
+                <svg width="28px" height="28px" viewBox="0 0 24 24" fill="none" class="svg-icon"
+                  style="width: 20px; height: 20px; margin: 0px 2px 1px 0px;">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M11.4427 11.541L11.8214 13.251H16.6197C17.9385 13.251 19.0968 14.255 19.1802 15.6294L19.2467 16.7254C19.3048 17.682 18.5775 18.4911 17.6596 18.4911H10.2362L10.2738 18.6596C10.3936 19.1966 10.8521 19.5766 11.3801 19.5766H16.5362C16.9126 19.5766 17.2178 19.8952 17.2178 20.2883C17.2178 20.6814 16.9126 21 16.5362 21H11.3801C10.2184 21 9.20986 20.164 8.94628 18.9825L8.83664 18.4911H8.76191C8.00829 18.4911 7.35815 17.9388 7.20487 17.1682L4.78382 4.99839C4.57872 3.96743 5.33249 3 6.34086 3H7.56408C8.71816 3 9.72214 3.82524 9.9932 4.99665L11.1437 10.191H16.2562C16.6514 10.191 16.9717 10.4933 16.9717 10.866C16.9717 11.2388 16.6514 11.541 16.2562 11.541H11.4427ZM6.11843 4.70888C6.08913 4.5616 6.19681 4.42339 6.34086 4.42339H7.56408C8.08866 4.42339 8.54502 4.7985 8.66823 5.33096L9.75027 10.191H9.2718C8.87668 10.191 8.55637 10.4933 8.55637 10.866C8.55637 11.2388 8.87668 11.541 9.2718 11.541H10.0508L10.7484 14.6744H16.6197C17.2191 14.6744 17.7819 15.0947 17.8198 15.7194L17.8864 16.8155C17.8947 16.9521 17.7908 17.0677 17.6596 17.0677H9.39261C9.38307 17.0675 9.37351 17.0675 9.36391 17.0677H8.76191C8.65425 17.0677 8.56138 16.9888 8.53948 16.8787L6.11843 4.70888Z"
+                    fill="currentColor"></path>
+                </svg>
+                {{ i.availableSeats }} Seats
+              </p>
+              <div class="rating clickable" (click)="openReviews(i); $event.stopPropagation()"> ⭐ {{ i.avgRating }}
+                <span>({{ i.reviewCount }} reviews)</span>
+              </div>
+              <!-- REVIEWS PANEL -->
+              <div *ngIf="showReviews && selectedInstanceId === i.instanceId" class="reviews-inline">
+
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <h4>{{ selectedVehicleName }} Reviews</h4>
+                  <button class="book-btn small" (click)="closeReviews()">Close</button>
+                </div>
+
+                <!-- LOADING -->
+                <div *ngIf="loadingReviews" class="empty">
+                  Loading reviews...
+                </div>
+
+                <!-- REVIEWS LIST -->
+                <div *ngIf="!loadingReviews && selectedVehicleReviews.length > 0">
+
+                  <div *ngFor="let r of selectedVehicleReviews" class="review-item">
+                    ⭐ {{ r.rating }} - {{ r.comments || 'No comment' }}
+                  </div>
+
+                </div>
+
+                <!-- EMPTY -->
+                <div *ngIf="!loadingReviews && selectedVehicleReviews.length === 0" class="empty">
+                  No reviews available
+                </div>
+
+              </div>
+            </div>
+            <div class="instance-action">
+              <div class="price">
+                ₹ {{ (i.calculatedPrice ?? i.minSeatPrice) | number:'1.0-2' }}
+                <h6 class="route">&nbsp; Onwards</h6>
+              </div>
+              <button *ngIf="isLoggedIn && role === 'Customer'" class="book-btn"
+                (click)="goToSeatLayout(i.vehicleId, i.instanceId)">
+                Book
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- NO RESULTS AFTER FILTER -->
+        <div *ngIf="!search && !isLoading && noFilterResults" class="no-filter-results">
+          <img src="../../Assets/Images/no-results.jpg" class="no-results-img">
+          <h2>No results found</h2>
+          <p>No services match the selected filters.</p>
+          <button class="filter-btn outline" (click)="resetFilters()">
+            Reset Filters
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </section>
+</div>

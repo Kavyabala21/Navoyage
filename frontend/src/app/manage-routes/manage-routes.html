@@ -1,0 +1,180 @@
+<div class="route-container">
+
+  <!-- HEADER -->
+  <div class="route-header">
+
+    <div class="title-section">
+      <h2>Route Management</h2>
+      <p>Create and manage travel routes and stop sequences</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-primary" [disabled]="!selectedRoute" (click)="enableEdit()">
+        Edit Route
+      </button>
+
+      <button class="btn outline" (click)="gotoStops()">
+        Manage Stops
+      </button>
+    </div>
+
+  </div>
+
+
+  <!-- MAIN CONTENT -->
+  <div class="route-layout">
+
+    <!-- EXISTING ROUTES -->
+    <div class="card route-list">
+
+      <h4>Existing Routes</h4>
+
+      <input type="text" placeholder="Search routes..." class="search-input" name="routeSearch"
+        [(ngModel)]="routeSearch" (input)="searchRoutes()">
+
+      <ng-container *ngIf="routes && routes.length > 0; else noRoutes">
+
+        <table class="route-table">
+
+          <thead>
+            <tr>
+              <th></th>
+              <th>ID</th>
+              <th>Route Name</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr *ngFor="let route of filteredRoutes" [class.active-row]="selectedRoute?.routeId === route.routeId">
+
+              <td>
+                <input type="radio" name="routeSelect" (change)="selectRoute(route)">
+              </td>
+
+              <td>{{ route.routeId }}</td>
+              <td>{{ route.routeName }}</td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </ng-container>
+
+      <ng-template #noRoutes>
+        <div class="empty-msg">No routes found</div>
+      </ng-template>
+
+    </div>
+
+
+    <!-- CREATE / EDIT ROUTE -->
+    <div class="card route-form" *ngIf="formVisible">
+
+      <h4>{{ isEditMode ? 'Edit Route' : 'Create Route' }}</h4>
+
+      <form (ngSubmit)="routeForm.valid && saveRoute()" #routeForm="ngForm">
+
+        <!-- ROUTE NAME -->
+        <div class="form-group">
+
+          <label>Route Name</label>
+
+          <input class="form-control" [(ngModel)]="routeName" name="routeName" required #routeNameCtrl="ngModel"
+            placeholder="Enter Route Name">
+
+          <div class="error" *ngIf="routeNameCtrl.invalid && (routeNameCtrl.touched || routeForm.submitted)">
+            Route name is required
+          </div>
+
+        </div>
+
+
+        <!-- STOPS -->
+        <div class="stop-layout">
+
+          <!-- AVAILABLE STOPS -->
+          <div class="stop-column">
+
+            <h5>Available Stops</h5>
+
+            <input type="text" placeholder="Search stops..." class="search-input" name="stopSearch"
+              [(ngModel)]="stopSearch" (input)="searchStops()">
+
+            <ul class="stop-box">
+
+              <li *ngFor="let stop of filteredStops">
+
+                <span>{{ stop.stopName }}</span>
+
+                <button type="button" class="btn small primary" (click)="addStop(stop)">
+                  Add
+                </button>
+
+              </li>
+
+            </ul>
+
+          </div>
+
+
+          <!-- SELECTED STOPS -->
+          <div class="stop-column">
+
+            <h5>Selected Stops</h5>
+
+            <ul class="stop-box selected">
+
+              <li *ngFor="let stop of selectedStops; let i=index">
+
+                <div class="stop-info">
+
+                  <span class="sequence">{{ stop.sequenceOrder }}</span>
+
+                  <span class="stop-name">
+                    {{ stop.stopName }}
+                  </span>
+
+                </div>
+
+                <div class="stop-actions">
+
+                  <button type="button" class="btn icon" (click)="moveUp(i)">↑</button>
+
+                  <button type="button" class="btn icon" (click)="moveDown(i)">↓</button>
+
+                  <button type="button" class="btn icon danger" (click)="removeStop(i)">✕</button>
+
+                </div>
+
+              </li>
+
+            </ul>
+
+          </div>
+
+        </div>
+
+
+        <!-- ACTION BUTTONS -->
+        <div class="form-actions">
+
+          <button type="submit" class="btn success">
+            {{ isEditMode ? 'Update Route' : 'Create Route' }}
+          </button>
+
+          <button type="button" class="btn secondary" (click)="cancelForm()">
+            Cancel
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
